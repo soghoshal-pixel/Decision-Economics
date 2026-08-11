@@ -4,64 +4,451 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Decision Economics v0.2</title>
+
 <style>
-:root{--bg:#f4f6f8;--card:#fff;--ink:#14212b;--muted:#6b7780;--line:#dfe5e9;--dark:#17313b;--soft:#edf2f4}
+:root{
+  --bg:#f6f6f5;
+  --surface:#ffffff;
+  --surface-soft:#f3f3f2;
+  --ink:#1d1d1f;
+  --muted:#6f6f73;
+  --line:#dededc;
+  --accent:#2563eb;
+  --accent-2:#1d4ed8;
+  --success:#2563eb;
+  --shadow:0 16px 40px rgba(15,23,32,.06);
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.shell{max-width:1180px;margin:auto;padding:28px 20px 60px}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:22px}
-.kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:var(--muted)}
-h1{font-size:38px;letter-spacing:-.035em;margin:5px 0 7px}
-.sub{color:var(--muted);max-width:720px;line-height:1.45}
-.badge{background:var(--dark);color:white;border-radius:999px;padding:9px 13px;font-size:12px;font-weight:700;white-space:nowrap}
-.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:20px 0}
-.step{padding:10px;border-radius:10px;background:#e7ebee;color:#65717a;font-size:12px;font-weight:750;text-align:center}
-.step.active{background:var(--dark);color:#fff}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 8px 28px rgba(20,33,43,.05)}
-.page{display:none}.page.active{display:block}
-h2{font-size:22px;margin:0 0 6px} .lead{color:var(--muted);margin:0 0 22px;line-height:1.5}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.field{margin-bottom:17px}
-label{display:block;font-size:13px;font-weight:750;margin-bottom:7px}
-small{color:var(--muted)}
-input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;font-size:15px;background:#fff;color:var(--ink)}
-.choicegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.choice{border:1px solid var(--line);padding:14px;border-radius:13px;cursor:pointer;background:#fff}
-.choice input{width:auto;margin-right:7px}
-.choice strong{font-size:14px}.choice div{font-size:12px;color:var(--muted);margin:5px 0 0 23px;line-height:1.35}
-.nav{display:flex;justify-content:space-between;margin-top:22px;gap:10px}
-button{border:0;border-radius:11px;padding:12px 18px;font-weight:800;cursor:pointer}
-.primary{background:var(--dark);color:#fff}.secondary{background:#e8ecef;color:var(--ink)}
-.results{display:grid;grid-template-columns:.9fr 1.3fr;gap:18px}
-.hero{background:var(--dark);color:#fff;border-radius:18px;padding:23px}
-.hero .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.7;font-weight:800}
-.hero .decision{font-size:36px;font-weight:900;letter-spacing:-.04em;margin:6px 0}
-.hero p{opacity:.82;line-height:1.45;margin-bottom:0}
-.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.metric{background:var(--soft);padding:15px;border-radius:14px}
-.metric .k{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
-.metric .v{font-size:22px;font-weight:850;margin-top:5px}
-.section{margin-top:18px;border-top:1px solid var(--line);padding-top:17px}
-.arch{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
-.pill{background:var(--soft);padding:8px 10px;border-radius:999px;font-size:12px;font-weight:700}
-.score{display:grid;grid-template-columns:125px 1fr 45px;gap:10px;align-items:center;margin:9px 0;font-size:12px}
-.track{height:9px;background:#e9edef;border-radius:999px;overflow:hidden}.fill{height:100%;background:var(--dark)}
-.callout{margin-top:16px;padding:14px 15px;border:1px solid var(--line);border-radius:13px;font-size:13px;line-height:1.5}
-.insight{margin-top:20px;background:var(--dark);color:#fff;border-radius:16px;padding:18px}
-.insight .ik{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:850;opacity:.65}
-.insight .iv{font-size:24px;font-weight:900;letter-spacing:-.025em;margin:5px 0}
-.insight .id{font-size:12px;line-height:1.45;opacity:.82}
-.insight .mini{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
-.insight .mini span{background:rgba(255,255,255,.12);padding:7px 9px;border-radius:999px;font-size:11px;font-weight:750}
-.disclaimer{font-size:11px;color:var(--muted);margin-top:18px;line-height:1.4}
-@media(max-width:760px){.grid2,.results{grid-template-columns:1fr}.choicegrid{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.top{display:block}.badge{display:inline-block;margin-top:12px}.metrics{grid-template-columns:1fr}}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.shell{
+  max-width:1220px;
+  margin:auto;
+  padding:28px 22px 72px;
+}
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:24px;
+  margin-bottom:28px;
+}
+.kicker{
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  font-weight:800;
+  color:var(--muted);
+}
+h1{
+  font-size:44px;
+  line-height:1.02;
+  letter-spacing:-.045em;
+  margin:6px 0 10px;
+  font-weight:850;
+}
+.sub{
+  color:var(--muted);
+  max-width:760px;
+  line-height:1.55;
+  font-size:16px;
+}
+.badge{
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--accent);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.04em;
+  box-shadow:0 6px 20px rgba(15,23,32,.03);
+}
+.steps{
+  display:grid;
+  gap:0;
+  margin:22px 0 18px;
+  background:transparent;
+  border-bottom:1px solid var(--line);
+}
+.step{
+  position:relative;
+  padding:12px 8px 14px;
+  background:transparent;
+  color:#7b8790;
+  font-size:11px;
+  font-weight:800;
+  text-align:center;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.step.active{
+  color:var(--accent);
+}
+.step.active:after{
+  content:"";
+  position:absolute;
+  left:14%;
+  right:14%;
+  bottom:-1px;
+  height:3px;
+  border-radius:999px 999px 0 0;
+  background:var(--accent);
+}
+.panel{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:34px;
+  box-shadow:var(--shadow);
+}
+.page{display:none}
+.page.active{display:block}
+h2{
+  font-size:27px;
+  letter-spacing:-.025em;
+  margin:0 0 7px;
+  font-weight:820;
+}
+.lead{
+  color:var(--muted);
+  margin:0 0 28px;
+  line-height:1.55;
+  font-size:14px;
+  max-width:840px;
+}
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px 22px;
+}
+.field{margin-bottom:2px}
+label{
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:7px;
+  color:#2b2b2d;
+}
+small{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.45;
+  margin-top:6px;
+}
+input,select{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #d7dde2;
+  border-radius:12px;
+  font-size:14px;
+  background:#fff;
+  color:var(--ink);
+  outline:none;
+  transition:.16s ease;
+}
+input:focus,select:focus{
+  border-color:#8eb0ff;
+  box-shadow:0 0 0 3px rgba(37,99,235,.08);
+}
+.choicegrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:11px;
+}
+.choice{
+  border:1px solid var(--line);
+  padding:15px;
+  border-radius:14px;
+  cursor:pointer;
+  background:#fff;
+  transition:.16s ease;
+}
+.choice:hover{
+  border-color:#b9c5cc;
+  background:#fbfcfd;
+}
+.choice input{
+  width:auto;
+  margin-right:7px;
+}
+.choice strong{
+  font-size:13px;
+}
+.choice div{
+  font-size:11px;
+  color:var(--muted);
+  margin:5px 0 0 23px;
+  line-height:1.4;
+}
+.nav{
+  display:flex;
+  justify-content:space-between;
+  margin-top:30px;
+  gap:10px;
+}
+button{
+  border:0;
+  border-radius:10px;
+  padding:12px 18px;
+  font-weight:800;
+  cursor:pointer;
+  font-size:13px;
+}
+.primary{
+  background:var(--accent);
+  color:#fff;
+}
+.primary:hover{background:var(--accent-2)}
+.secondary{
+  background:#eeeeed;
+  color:var(--ink);
+}
+.results{
+  display:grid;
+  grid-template-columns:.92fr 1.28fr;
+  gap:24px;
+}
+.hero{
+  background:#222224;
+  color:#fff;
+  border-radius:20px;
+  padding:26px;
+  box-shadow:0 14px 30px rgba(0,0,0,.12);
+}
+.hero .eyebrow{
+  font-size:10px;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  opacity:.7;
+  font-weight:800;
+}
+.hero .decision{
+  font-size:40px;
+  font-weight:900;
+  letter-spacing:-.045em;
+  margin:6px 0 9px;
+}
+.hero p{
+  opacity:.84;
+  line-height:1.5;
+  margin-bottom:0;
+  font-size:13px;
+}
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.metric{
+  background:var(--surface-soft);
+  padding:17px;
+  border-radius:15px;
+  border:1px solid #e6eaed;
+}
+.metric .k{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--muted);
+  font-weight:850;
+}
+.metric .v{
+  font-size:24px;
+  font-weight:850;
+  margin-top:6px;
+  letter-spacing:-.03em;
+}
+.section{
+  margin-top:22px;
+  border-top:1px solid var(--line);
+  padding-top:18px;
+}
+.arch{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:10px;
+}
+.pill{
+  background:#f1f1f0;
+  color:#3b3b3e;
+  padding:8px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  border:1px solid #e1e1df;
+}
+.score{
+  display:grid;
+  grid-template-columns:130px 1fr 48px;
+  gap:10px;
+  align-items:center;
+  margin:10px 0;
+  font-size:11px;
+  color:#43505a;
+}
+.track{
+  height:8px;
+  background:#e9edef;
+  border-radius:999px;
+  overflow:hidden;
+}
+.fill{
+  height:100%;
+  background:var(--accent);
+}
+.callout{
+  margin-top:20px;
+  padding:17px 18px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  font-size:12px;
+  line-height:1.55;
+  background:#fbfcfd;
+}
+.insight{
+  margin-top:24px;
+  background:#fafafa;
+  color:var(--ink);
+  border:1px solid #e1e1df;
+  border-left:4px solid var(--accent);
+  border-radius:16px;
+  padding:20px 21px;
+}
+.insight .ik{
+  font-size:9px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  font-weight:900;
+  color:#747478;
+}
+.insight .iv{
+  font-size:27px;
+  font-weight:900;
+  letter-spacing:-.035em;
+  margin:5px 0;
+  color:#2563eb;
+}
+.insight .id{
+  font-size:12px;
+  line-height:1.5;
+  color:#6f6f73;
+}
+.insight .mini{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.insight .mini span{
+  background:#fff;
+  color:#444447;
+  border:1px solid #e1e1df;
+  padding:7px 9px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:800;
+}
+.disclaimer{
+  font-size:10px;
+  color:#7a858e;
+  margin-top:18px;
+  line-height:1.5;
+}
+@media(max-width:760px){
+  .grid2,.results{grid-template-columns:1fr}
+  .choicegrid{grid-template-columns:1fr}
+  .steps{grid-template-columns:repeat(2,1fr)!important}
+  .top{display:block}
+  .badge{display:inline-block;margin-top:12px}
+  .metrics{grid-template-columns:1fr}
+  h1{font-size:36px}
+  .panel{padding:24px 18px}
+}
+
+.portfolio-page{display:block}.assessment-shell{display:none}
+.portfolio-hero h2{font-size:34px;margin-bottom:10px}.portfolio-hero .lead{max-width:920px;font-size:15px}
+.portfolio-actions{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 26px}
+.portfolio-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0 28px}
+.portfolio-kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
+.portfolio-kpi .pk{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:900}
+.portfolio-kpi .pv{font-size:28px;font-weight:900;letter-spacing:-.035em;margin-top:6px}
+.portfolio-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff}
+.portfolio-table{width:100%;border-collapse:collapse;min-width:900px}
+.portfolio-table th{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);background:#fafafa}
+.portfolio-table td{padding:14px;border-bottom:1px solid #ececea;font-size:12px}.portfolio-table tr:last-child td{border-bottom:0}
+.rank{font-size:18px;font-weight:900;color:var(--accent)}.uc{font-weight:850;font-size:13px}.domain{color:var(--muted);font-size:10px;margin-top:3px}
+.tag{display:inline-block;border-radius:999px;padding:6px 8px;background:#f2f2f1;border:1px solid #e1e1df;font-size:9px;font-weight:850;white-space:nowrap}
+.tag.accent{background:#eff4ff;border-color:#d6e3ff;color:#1d4ed8}
+.tag.negative{background:#f7f7f6;border-color:#c9c9c6;color:#2a2a2c}
+.value-negative{font-weight:900;color:#2a2a2c}.empty-state{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-state strong{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}.portfolio-note{margin-top:18px;color:var(--muted);font-size:11px;line-height:1.5}
+.savebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px}.linkbtn{background:transparent;color:var(--accent);padding:8px 0}
+@media(max-width:760px){.portfolio-kpis{grid-template-columns:1fr 1fr}}
+
+.portfolio-fab{
+  position:fixed;
+  right:22px;
+  bottom:22px;
+  z-index:50;
+  display:none;
+  background:#ffffff;
+  color:var(--accent);
+  border:1px solid #d8e2ff;
+  box-shadow:0 10px 28px rgba(0,0,0,.10);
+  border-radius:999px;
+  padding:11px 15px;
+  font-size:12px;
+  font-weight:850;
+  cursor:pointer;
+}
+.portfolio-fab:hover{background:#f7f9ff}
+
+.assumption-mode{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 18px}
+.assumption-mode button{background:#f2f2f1;color:var(--ink);border:1px solid var(--line)}
+.assumption-mode button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.scenario-card{border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff}
+.scenario-card.active{border-color:#b9cdfd;background:#f8fbff}
+.scenario-card .sk{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:900}
+.scenario-card .sv{font-size:20px;font-weight:900;margin:5px 0}
+.scenario-card .sd{font-size:10px;color:var(--muted);line-height:1.4}
+.custom-assumptions{display:none;margin-top:14px}
+.assumption-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:8px}
+@media(max-width:760px){.scenario-grid{grid-template-columns:1fr}}
 </style>
+
 </head>
 <body>
 <div class="shell">
+<div id="portfolioPage" class="portfolio-page">
+ <div class="top"><div><div class="kicker">DECISION ECONOMICS · PAYER</div><h1>AI Investment Portfolio</h1><div class="sub">Turn individual workflow assessments into an enterprise view of where AI, automation, and human judgment can create the most value.</div></div><div class="badge">PAYER PROTOTYPE · v1.2</div></div>
+ <div class="panel">
+  <div class="portfolio-hero"><div class="kicker">PORTFOLIO VIEW</div><h2>Where should we invest first?</h2>
+   <p class="lead">Assess payer workflows one at a time, save each recommendation, and build a prioritized portfolio. Decision Economics compares current cost, future-state economics, capacity opportunity, work design, organizational readiness, and risk—then surfaces the opportunities most ready for action. Negative economic cases are retained intentionally so the portfolio can show where AI-enabled redesign does not yet justify the cost.</p>
+   <p class="lead"><strong>How to use it:</strong> Start with a workflow, complete the assessment, and save it here. Repeat for additional use cases. Reset the portfolio when you want to begin a new client, workshop, or scenario.</p>
+  </div>
+  <div class="portfolio-actions"><button class="primary" onclick="startNewAssessment()">+ Assess New Use Case</button><button id="resetPortfolioBtn" class="secondary" onclick="resetPortfolio()">Reset Portfolio</button></div>
+  <div class="portfolio-kpis">
+   <div class="portfolio-kpi"><div class="pk">Use Cases Assessed</div><div class="pv" id="pkUseCases">0</div></div>
+   <div class="portfolio-kpi"><div class="pk">Potential Annual Value</div><div class="pv" id="pkValue">$0</div></div>
+   <div class="portfolio-kpi"><div class="pk">Capacity Opportunity</div><div class="pv" id="pkCapacity">0 FTE</div></div>
+   <div class="portfolio-kpi"><div class="pk">Est. Future-State Cost</div><div class="pv" id="pkFuture">$0</div></div>
+  </div>
+  <div class="portfolio-table-wrap"><table class="portfolio-table"><thead><tr><th>Priority</th><th>Use Case</th><th>Annual Value</th><th>Capacity</th><th>Work Design</th><th>Readiness</th><th>Risk-Adjusted</th><th>Action</th><th></th></tr></thead><tbody id="portfolioRows"></tbody></table><div id="portfolioEmpty" class="empty-state"><strong>No use cases assessed yet.</strong>Start with one payer workflow and build the portfolio from there.</div></div>
+  <div class="portfolio-note">Saved assessments are stored locally in this browser. Reset Portfolio clears the saved use cases on this device so you can begin a fresh client or workshop.</div>
+ </div>
+</div>
+<div id="assessmentShell" class="assessment-shell">
  <div class="top">
-  <div><div class="kicker">AI WORK DESIGN</div><h1>Decision Economics</h1><div class="sub">Translate a business workflow into an economically grounded human + AI work design.</div></div>
-  <div class="badge">PAYER DEMO · v0.2</div>
+  <div><div class="kicker">AI WORK DESIGN</div><h1>Decision Economics</h1><div class="sub">Evaluate where AI, automation, and human judgment create the most economic value.</div></div>
+  <div class="badge">PAYER PROTOTYPE · v1</div>
  </div>
  <div class="steps" style="grid-template-columns:repeat(6,1fr)">
   <div class="step active">1 · Decision</div><div class="step">2 · Value Opportunity</div><div class="step">3 · Work</div><div class="step">4 · Readiness</div><div class="step">5 · Risk</div><div class="step">6 · Recommendation</div>
@@ -72,17 +459,15 @@ button{border:0;border-radius:11px;padding:12px 18px;font-weight:800;cursor:poin
    <h2>What decision are we redesigning?</h2>
    <p class="lead">Start with the work—not the model. Define one repeatable decision or task inside the workflow.</p>
    <div class="grid2">
-    <div class="field"><label>Business function</label><select id="function"><option>Claims</option><option>Utilization Management</option><option>Member Services</option><option>Provider Operations</option><option>Payment Integrity</option></select></div>
     <div class="field">
-      <label>Workflow</label>
-      <select id="workflow">
-        <option>Provider claim appeal review</option>
-        <option>Prior authorization review</option>
-        <option>Payment integrity investigation</option>
-        <option>Provider inquiry resolution</option>
-        <option>Member grievance / appeal review</option>
-        <option>Complex claims exception review</option>
-      </select>
+      <label>Business function / domain</label>
+      <select id="function"></select>
+      <small>Select the payer domain first; available workflows will update automatically.</small>
+    </div>
+    <div class="field">
+      <label>Workflow / use case</label>
+      <select id="workflow"></select>
+      <small id="workflowDescription">Select a workflow to see what work is being evaluated.</small>
     </div>
     <div class="field">
       <label>Decision or task being evaluated</label>
@@ -227,14 +612,73 @@ button{border:0;border-radius:11px;padding:12px 18px;font-weight:800;cursor:poin
      <div class="mini" id="workTech"></div>
    </div>
    <div class="callout">
-     <strong>Estimated future-state assumptions</strong>
-     <div style="font-size:12px;color:var(--muted);margin-top:4px">These are planning assumptions generated from the work design—not validated performance. Adjust them if the client has a stronger hypothesis; validate them in the prototype.</div>
-     <div class="grid2" style="margin-top:14px">
-       <div class="field"><label>Estimated human time reduction (%)</label><input id="timeReduction" type="number" min="0" max="100" value="65"><small>Expected reduction in hands-on human minutes per decision.</small></div>
-       <div class="field"><label>Estimated technology cost / decision ($)</label><input id="futureTechCost" type="number" min="0" step=".01" value=".35"><small>Illustrative inference, retrieval, orchestration, and workflow run cost.</small></div>
-       <div class="field"><label>Estimated incremental platform / monitoring cost ($ / month)</label><input id="futureFixed" type="number" min="0" step="1000" value="45000"><small>Ongoing technology, monitoring, and operational allocation.</small></div>
+     <strong>Future-state economic hypothesis</strong>
+     <div class="assumption-note">Decision Economics generates a planning hypothesis from the work characteristics, readiness, and risk profile. Client evidence can override it; the rapid prototype validates it.</div>
+
+     <div class="assumption-mode">
+       <button type="button" id="modeEstimate" class="active" onclick="setAssumptionMode('estimate')">Use Decision Economics Estimate</button>
+       <button type="button" id="modeRange" onclick="setAssumptionMode('range')">Model a Range</button>
+       <button type="button" id="modeCustom" onclick="setAssumptionMode('custom')">Use My Assumptions</button>
+     </div>
+
+     <div id="scenarioGrid" class="scenario-grid">
+       <div class="scenario-card" id="scenarioConservative">
+         <div class="sk">Conservative</div>
+         <div class="sv" id="consTime">—</div>
+         <div class="sd" id="consCost">—</div>
+       </div>
+       <div class="scenario-card active" id="scenarioExpected">
+         <div class="sk">Expected</div>
+         <div class="sv" id="expTime">—</div>
+         <div class="sd" id="expCost">—</div>
+       </div>
+       <div class="scenario-card" id="scenarioUpside">
+         <div class="sk">Upside</div>
+         <div class="sv" id="upTime">—</div>
+         <div class="sd" id="upCost">—</div>
+       </div>
+     </div>
+
+     <div id="rangeSummary" class="assumption-note"></div>
+
+     <div id="customAssumptions" class="custom-assumptions">
+       <div class="grid2">
+         <div class="field">
+           <label>Estimated human time reduction (%)</label>
+           <input id="timeReduction" type="number" min="0" max="100" value="50">
+           <small>Expected reduction in hands-on human minutes per decision.</small>
+         </div>
+         <div class="field">
+           <label>Estimated technology cost / decision ($)</label>
+           <input id="futureTechCost" type="number" min="0" step=".01" value=".40">
+           <small>Illustrative inference, retrieval, orchestration, and workflow run cost.</small>
+         </div>
+         <div class="field">
+           <label>Use-case-specific fixed cost ($ / month)</label>
+           <input id="futureFixed" type="number" min="0" step="1000" value="12000">
+           <small>Dedicated workflow support, monitoring, maintenance, and use-case-specific operational cost.</small>
+         </div>
+         <div class="field">
+           <label>Shared enterprise platform allocation ($ / month)</label>
+           <input id="sharedPlatform" type="number" min="0" step="1000" value="5000">
+           <small>Allocated share of enterprise AI platform / infrastructure cost. Set to $0 if already treated as sunk/shared enterprise cost.</small>
+         </div>
+       </div>
      </div>
    </div>
+
+   <div class="callout" id="futureCostAnatomy">
+     <strong>Estimated future-state cost anatomy</strong>
+     <div class="metrics" style="margin-top:12px">
+       <div class="metric"><div class="k">Remaining human labor</div><div class="v" id="fcLabor">$0</div></div>
+       <div class="metric"><div class="k">Variable technology</div><div class="v" id="fcVariable">$0</div></div>
+       <div class="metric"><div class="k">Use-case fixed cost</div><div class="v" id="fcFixed">$0</div></div>
+       <div class="metric"><div class="k">Shared platform allocation</div><div class="v" id="fcShared">$0</div></div>
+     </div>
+     <div id="economicSignal" style="margin-top:12px;font-size:12px;font-weight:800"></div>
+     <div id="economicDriver" style="margin-top:5px;font-size:11px;color:var(--muted);line-height:1.45"></div>
+   </div>
+
    <div class="nav"><button class="secondary" onclick="back()">← Back</button><button class="primary" onclick="updateWorkOutput();next()">Assess readiness →</button></div>
   </div>
 
@@ -303,19 +747,102 @@ button{border:0;border-radius:11px;padding:12px 18px;font-weight:800;cursor:poin
       <div class="metric"><div class="k">Estimated future cost / decision</div><div class="v" id="futureUnit"></div></div>
       <div class="metric"><div class="k">Estimated annual operating value</div><div class="v" id="annualValue"></div></div>
       <div class="metric"><div class="k">Estimated capacity released</div><div class="v" id="fte"></div></div>
-      <div class="metric"><div class="k">Est. quality value / year</div><div class="v" id="qualityValue"></div></div>
+      <div class="metric"><div class="k">Est. quality / accuracy value / year</div><div class="v" id="qualityValue"></div></div>
       <div class="metric"><div class="k">Human / AI work mix</div><div class="v" id="mix"></div></div>
      </div>
      <div class="callout" id="action"></div>
      <div class="disclaimer">Illustrative decision-support prototype. Outputs depend on client-supplied assumptions and are intended to frame discovery, prototyping, and validation—not replace detailed financial, clinical, actuarial, legal, or compliance analysis.</div>
     </div>
    </div>
-   <div class="nav"><button class="secondary" onclick="back()">← Change assumptions</button><button class="primary" onclick="restart()">Assess another decision</button></div>
+   <div class="savebar"><button class="primary" onclick="saveToPortfolio()">Save to Portfolio</button><button class="secondary" onclick="showPortfolio()">Back to Portfolio</button></div>
+<div class="nav"><button class="secondary" onclick="back()">← Change assumptions</button><button class="primary" onclick="restart()">Assess another decision</button></div>
   </div>
  </div>
-</div>
 
+
+</div>
+</div>
+<button id="portfolioFab" class="portfolio-fab" onclick="showPortfolio()">← Portfolio</button>
 <script>
+let editingPortfolioId=null;
+
+const PORTFOLIO_KEY='decisionEconomicsPayerPortfolioV12';
+function getPortfolio(){try{return JSON.parse(localStorage.getItem(PORTFOLIO_KEY)||'[]')}catch(e){return[]}}
+function setPortfolio(x){localStorage.setItem(PORTFOLIO_KEY,JSON.stringify(x))}
+function numText(x){return Number(String(x||'').replace(/[^0-9.-]/g,''))||0}
+function showPortfolio(){document.getElementById('portfolioPage').style.display='block';document.getElementById('assessmentShell').style.display='none';document.getElementById('portfolioFab').style.display='none';renderPortfolio();window.scrollTo(0,0)}
+function showAssessment(){document.getElementById('portfolioPage').style.display='none';document.getElementById('assessmentShell').style.display='block';document.getElementById('portfolioFab').style.display='block';window.scrollTo(0,0)}
+function startNewAssessment(){restart();showAssessment()}
+function resetPortfolio(){
+  try{
+    // Clear every Decision Economics portfolio key from this browser,
+    // including keys created by earlier prototype versions.
+    const keys=[];
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k && k.toLowerCase().includes('decisioneconomics')) keys.push(k);
+    }
+    keys.forEach(k=>localStorage.removeItem(k));
+    sessionStorage.clear();
+
+    // Force the visible portfolio back to an empty state immediately.
+    const rows=document.getElementById('portfolioRows');
+    if(rows) rows.innerHTML='';
+    const empty=document.getElementById('portfolioEmpty');
+    if(empty) empty.style.display='block';
+
+    document.getElementById('pkUseCases').textContent='0';
+    document.getElementById('pkValue').textContent='$0';
+    document.getElementById('pkCapacity').textContent='0 FTE';
+    document.getElementById('pkFuture').textContent='$0';
+
+    editingPortfolioId=null;
+    renderPortfolio();
+
+    const btn=document.getElementById('resetPortfolioBtn');
+    if(btn){
+      const old=btn.textContent;
+      btn.textContent='Portfolio Reset ✓';
+      setTimeout(()=>btn.textContent=old,1400);
+    }
+  }catch(e){
+    console.error('Reset failed',e);
+    alert('Reset failed in this browser. Please refresh and try again.');
+  }
+}
+function actionLabel(r){return r==='READY TO PROTOTYPE'?'Prototype Now':r==='PROTOTYPE WITH CONDITIONS'?'Controlled Prototype':'Enable First'}
+function tier(a){return a==='Prototype Now'?1:a==='Controlled Prototype'?2:3}
+function saveToPortfolio(){
+ try{
+ calculate();
+ const volume=n('volume'), futureUnit=numText(document.getElementById('futureUnit').textContent);
+ const readiness=document.getElementById('readyHeadline').textContent;
+ const operatingValue=numText(document.getElementById('annualValue').textContent);
+ const qualityValue=numText(document.getElementById('qualityValue').textContent);
+ const item={id:'uc_'+Date.now(),domain:val('function'),workflow:val('workflow'),
+ annualValue:operatingValue+qualityValue,operatingValue:operatingValue,qualityValue:qualityValue,
+ capacity:numText(document.getElementById('fte').textContent),futureAnnual:futureUnit*volume*12,
+ work:getWorkDesign(),readiness:readiness,risk:riskAutonomy(),action:actionLabel(readiness)};
+ const items=getPortfolio();items.push(item);setPortfolio(items);showPortfolio();
+ }catch(e){console.error(e);alert('Could not save this assessment yet. You can still return to the portfolio using the Portfolio button.');}
+}
+function deletePortfolioItem(id){setPortfolio(getPortfolio().filter(x=>x.id!==id));renderPortfolio()}
+function renderPortfolio(){
+ const items=getPortfolio().sort((a,b)=>tier(a.action)-tier(b.action)||b.annualValue-a.annualValue);
+ document.getElementById('pkUseCases').textContent=items.length;
+ document.getElementById('pkValue').textContent=money(items.reduce((s,x)=>s+x.annualValue,0));
+ document.getElementById('pkCapacity').textContent=items.reduce((s,x)=>s+x.capacity,0).toFixed(1)+' FTE';
+ document.getElementById('pkFuture').textContent=money(items.reduce((s,x)=>s+x.futureAnnual,0));
+ document.getElementById('portfolioRows').innerHTML=items.map((x,i)=>`<tr><td class="rank">${i+1}</td><td><div class="uc">${x.workflow}</div><div class="domain">${x.domain}</div></td><td>
+  <div class="${x.annualValue<0?'value-negative':''}">${money(x.annualValue)}</div>
+  ${(typeof x.operatingValue==='number' && typeof x.qualityValue==='number')
+      ? `<div class="domain">Operating ${money(x.operatingValue)} · Quality / Accuracy ${money(x.qualityValue)}</div>`
+      : ''}
+  ${x.annualValue<0?'<span class="tag negative" style="margin-top:5px">Negative Economic Case</span>':''}
+</td><td>${x.capacity.toFixed(1)} FTE</td><td><span class="tag">${x.work}</span></td><td><span class="tag">${x.readiness==='READY TO PROTOTYPE'?'READY':x.readiness==='PROTOTYPE WITH CONDITIONS'?'CONDITIONAL':'CONSTRAINED'}</span></td><td><span class="tag">${x.risk}</span></td><td><span class="tag accent">${x.action}</span></td><td><button class="linkbtn" onclick="deletePortfolioItem('${x.id}')">Delete</button></td></tr>`).join('');
+ document.getElementById('portfolioEmpty').style.display=items.length?'none':'block';
+}
+
 let page=0;
 const pages=[...document.querySelectorAll('.page')], steps=[...document.querySelectorAll('.step')];
 function show(){pages.forEach((p,i)=>p.classList.toggle('active',i===page));steps.forEach((s,i)=>s.classList.toggle('active',i===page));window.scrollTo({top:0,behavior:'smooth'})}
@@ -415,6 +942,98 @@ function updateRiskOutput(){
  document.getElementById('riskControls').innerHTML=[...new Set(controls)].map(x=>'<span>'+x+'</span>').join('');
  return result;
 }
+
+let assumptionMode='estimate';
+
+function readinessFactor(){
+ const vals=[n('workflowReady'),n('dataAccess'),n('dataQuality'),n('integration'),n('ownership')];
+ const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+ return avg>=2.8?1:avg>=2?0.9:0.75;
+}
+function riskFactor(){
+ const result=riskAutonomy();
+ return result==='AUTOMATE'?1:result==='AUGMENT'?.88:result==='ASSIST'?.65:.45;
+}
+function architectureComplexity(){
+ const a=architecture();
+ let score=1;
+ if(a.some(x=>x.includes('Retrieval'))) score+=1;
+ if(a.some(x=>x.includes('Language')||x.includes('Model'))) score+=1;
+ if(a.some(x=>x.includes('Reasoning'))) score+=1;
+ if(a.some(x=>x.includes('Human Judgment'))) score+=1;
+ return Math.min(score,5);
+}
+function generatedAssumptions(){
+ const design=getWorkDesign();
+ const baseTime={HUMAN:15,ASSIST:30,AUGMENT:50,AUTOMATE:70}[design]||30;
+ const expectedTime=Math.round(Math.max(10,Math.min(80,baseTime*readinessFactor()*riskFactor())));
+ const complexity=architectureComplexity();
+ const expectedTech=Number((0.08 + complexity*0.10).toFixed(2));
+ const expectedFixed=Math.round((6000 + complexity*2500 + (readinessFactor()<1?4000:0))/1000)*1000;
+ const expectedShared=5000;
+ const conservative={
+   time:Math.max(5,Math.round(expectedTime*0.7)),
+   tech:Number((expectedTech*1.5).toFixed(2)),
+   fixed:Math.round(expectedFixed*1.2/1000)*1000,
+   shared:expectedShared
+ };
+ const expected={time:expectedTime,tech:expectedTech,fixed:expectedFixed,shared:expectedShared};
+ const upside={
+   time:Math.min(90,Math.round(expectedTime*1.25)),
+   tech:Number(Math.max(.03,expectedTech*0.75).toFixed(2)),
+   fixed:Math.round(expectedFixed*0.9/1000)*1000,
+   shared:expectedShared
+ };
+ return {conservative,expected,upside};
+}
+function scenarioEconomics(s){
+ const volume=n('volume'), mins=n('mins'), labor=n('labor');
+ const currentHours=volume*mins/60, current=currentHours*labor;
+ const futureHumanMinutes=mins*(1-s.time/100);
+ const futureHumanHours=volume*futureHumanMinutes/60;
+ const futureLabor=futureHumanHours*labor;
+ const futureTech=volume*s.tech;
+ const futureMonthly=futureLabor+futureTech+s.fixed+s.shared;
+ return {
+   futureMonthly,
+   futureUnit:volume?futureMonthly/volume:0,
+   operatingValue:(current-futureMonthly)*12,
+   fte:Math.max(0,(currentHours-futureHumanHours)/173.33)
+ };
+}
+function updateGeneratedAssumptions(){
+ const g=generatedAssumptions();
+ document.getElementById('consTime').textContent=g.conservative.time+'% time reduction';
+ document.getElementById('expTime').textContent=g.expected.time+'% time reduction';
+ document.getElementById('upTime').textContent=g.upside.time+'% time reduction';
+ document.getElementById('consCost').textContent=money2(g.conservative.tech)+' tech / decision · '+money(g.conservative.fixed+g.conservative.shared)+'/mo fixed + shared';
+ document.getElementById('expCost').textContent=money2(g.expected.tech)+' tech / decision · '+money(g.expected.fixed+g.expected.shared)+'/mo fixed + shared';
+ document.getElementById('upCost').textContent=money2(g.upside.tech)+' tech / decision · '+money(g.upside.fixed+g.upside.shared)+'/mo fixed + shared';
+
+ const c=scenarioEconomics(g.conservative), e=scenarioEconomics(g.expected), u=scenarioEconomics(g.upside);
+ document.getElementById('rangeSummary').textContent=
+   assumptionMode==='range'
+   ? 'Illustrative annual operating value range: '+money(c.operatingValue)+' to '+money(u.operatingValue)+'. Expected case: '+money(e.operatingValue)+'.'
+   : 'Expected-case assumptions are generated from the current assessment and should be validated in a rapid prototype.';
+ return g;
+}
+function setAssumptionMode(mode){
+ assumptionMode=mode;
+ ['Estimate','Range','Custom'].forEach(x=>{
+   const el=document.getElementById('mode'+x);
+   if(el) el.classList.toggle('active', mode===x.toLowerCase());
+ });
+ document.getElementById('customAssumptions').style.display=mode==='custom'?'block':'none';
+ document.getElementById('scenarioGrid').style.display=mode==='custom'?'none':'grid';
+ updateGeneratedAssumptions();
+ calculate();
+}
+function activeAssumptions(){
+ if(assumptionMode==='custom'){
+   return {time:n('timeReduction'),tech:n('futureTechCost'),fixed:n('futureFixed'),shared:n('sharedPlatform')};
+ }
+ return generatedAssumptions().expected;
+}
 function calculate(){
  const volume=n('volume'), mins=n('mins'), labor=n('labor');
  const currentHours=volume*mins/60, current=currentHours*labor;
@@ -422,21 +1041,50 @@ function calculate(){
  const decision=riskAutonomy(), ready=updateReadiness(), arch=architecture();
  document.getElementById('architecture').innerHTML=arch.map(x=>`<span class="pill">${x}</span>`).join('');
  document.getElementById('decision').textContent=decision;
- document.getElementById('summary').textContent='This is the risk-adjusted target work design. Future-state cost, operating value, and capacity are planning estimates based on explicit assumptions and must be validated through a rapid prototype.';
+ document.getElementById('summary').textContent='This is the risk-adjusted target work design. Future-state cost, operating value, and capacity are planning estimates generated from the assessment unless client evidence overrides them; all should be validated through a rapid prototype.';
  document.getElementById('resultTitle').textContent=val('function')+' · '+val('workflow');
  document.getElementById('resultTask').textContent=val('task')+' · Primary role today: '+val('role');
  document.getElementById('currentUnit').textContent=money2(volume?current/volume:0);
- const timeReduction=clamp(n('timeReduction')/100,0,1);
+ const assumptions=activeAssumptions();
+ const timeReduction=clamp(assumptions.time/100,0,1);
  const futureHumanMinutes=mins*(1-timeReduction);
  const futureHumanHours=volume*futureHumanMinutes/60;
  const futureLabor=futureHumanHours*labor;
- const futureTech=volume*n('futureTechCost');
- const futureFixed=n('futureFixed');
- const futureMonthly=futureLabor+futureTech+futureFixed;
+ const futureTech=volume*assumptions.tech;
+ const futureFixed=assumptions.fixed;
+ const sharedPlatform=assumptions.shared;
+ const futureMonthly=futureLabor+futureTech+futureFixed+sharedPlatform;
  const futureUnit=volume?futureMonthly/volume:0;
  const operatingValue=(current-futureMonthly)*12;
  const releasedHours=Math.max(0,currentHours-futureHumanHours);
  const releasedFTE=releasedHours/173.33;
+
+ // Explain the cost anatomy instead of hiding it inside one number.
+ const parts=[
+   ['Remaining human labor',futureLabor],
+   ['Variable technology',futureTech],
+   ['Use-case fixed cost',futureFixed],
+   ['Shared platform allocation',sharedPlatform]
+ ];
+ const largest=parts.slice().sort((a,b)=>b[1]-a[1])[0];
+ const fcLabor=document.getElementById('fcLabor');
+ if(fcLabor){
+   fcLabor.textContent=money(futureLabor)+'/mo';
+   document.getElementById('fcVariable').textContent=money(futureTech)+'/mo';
+   document.getElementById('fcFixed').textContent=money(futureFixed)+'/mo';
+   document.getElementById('fcShared').textContent=money(sharedPlatform)+'/mo';
+   const signal=document.getElementById('economicSignal');
+   const driver=document.getElementById('economicDriver');
+   if(operatingValue<0){
+     signal.textContent='NEGATIVE OPERATING CASE';
+     signal.style.color='#2a2a2c';
+     driver.textContent='Estimated future operating cost exceeds the current cost of work by '+money(Math.abs(operatingValue))+' per year. Largest future-state cost driver: '+largest[0]+'.';
+   } else {
+     signal.textContent='POSITIVE OPERATING CASE';
+     signal.style.color='var(--accent)';
+     driver.textContent='Estimated future operating cost is below the current cost of work by '+money(operatingValue)+' per year. Largest future-state cost driver: '+largest[0]+'.';
+   }
+ }
  document.getElementById('futureUnit').textContent=money2(futureUnit);
  document.getElementById('annualValue').textContent=money(operatingValue);
  document.getElementById('fte').textContent=releasedFTE.toFixed(1)+' FTE';
@@ -455,6 +1103,59 @@ function calculate(){
  else action='<strong>Recommended next step: ENABLE / REDESIGN FIRST.</strong> Address the primary workflow, data, integration, or ownership constraint. Use a limited prototype only if needed to prove that the value opportunity justifies remediation.';
  document.getElementById('action').innerHTML=action;
 }
+
+const payerUseCases={
+ 'Utilization Management':[
+  {name:'Prior Authorization Review',desc:'Evaluate whether a requested service meets coverage and medical-necessity criteria using benefit, policy, authorization, and clinical information.',task:'Determine whether a requested service meets applicable coverage and medical-necessity criteria'}
+ ],
+ 'Claims':[
+  {name:'Claims Adjudication & Exception Handling',desc:'Resolve claims that cannot follow standard adjudication because of edits, missing information, conflicts, or other exceptions.',task:'Determine the appropriate disposition for a claim that falls outside standard adjudication'},
+  {name:'Provider Claim Appeals',desc:'Review a provider challenge to a claim denial or payment decision using the original claim, denial rationale, policy, and supporting evidence.',task:'Determine whether a denied claim should be upheld, adjusted, or overturned'}
+ ],
+ 'Payment Integrity':[
+  {name:'Prepay Payment Integrity Review',desc:'Evaluate a flagged claim before payment to determine whether billing, coding, policy, or documentation concerns warrant adjustment or further review.',task:'Determine whether a flagged claim should be paid, adjusted, denied, or escalated before payment'},
+  {name:'Overpayment Review & Recovery',desc:'Validate suspected overpayments after payment and determine whether recovery is appropriate based on claim, contract, policy, and supporting evidence.',task:'Determine whether a suspected overpayment is valid and should move to recovery'}
+ ],
+ 'Member Operations':[
+  {name:'Member Grievances & Appeals',desc:'Review member complaints or appeals, assemble relevant evidence, apply benefit and policy requirements, and determine the appropriate resolution.',task:'Determine the appropriate resolution to a member grievance or appeal'},
+  {name:'Complex Member Inquiry Resolution',desc:'Research and resolve member questions requiring information from multiple systems, policies, benefits, claims, or prior interactions.',task:'Determine the correct response and resolution for a complex member inquiry'}
+ ],
+ 'Provider Operations':[
+  {name:'Complex Provider Inquiry Resolution',desc:'Research and resolve provider questions involving claims, reimbursement, policy, authorization, contracting, or other multi-source information.',task:'Determine the correct response and resolution for a complex provider inquiry'}
+ ],
+ 'Enrollment':[
+  {name:'Enrollment & Eligibility Exception Handling',desc:'Resolve enrollment or eligibility cases that fail standard rules because of conflicting, missing, late, or unusual member information.',task:'Determine the appropriate resolution for an enrollment or eligibility exception'}
+ ],
+ 'Network Operations':[
+  {name:'Provider Credentialing',desc:'Verify provider qualifications and documentation against credentialing requirements and identify exceptions requiring additional review.',task:'Determine whether a provider satisfies credentialing requirements or requires exception review'}
+ ],
+ 'Other / Custom':[
+  {name:'Other / Custom Workflow',desc:'Use this for a payer workflow not included in the starter taxonomy. Define the specific decision or task below.',task:'Describe the specific decision or task being evaluated'}
+ ]
+};
+function populateWorkflows(preferred){
+ const items=payerUseCases[val('function')]||[];
+ const w=document.getElementById('workflow');
+ w.innerHTML=items.map(x=>`<option>${x.name}</option>`).join('');
+ if(preferred&&items.some(x=>x.name===preferred))w.value=preferred;
+ updateWorkflowContext(true);
+}
+function updateWorkflowContext(setTask){
+ const item=(payerUseCases[val('function')]||[]).find(x=>x.name===val('workflow'));
+ if(!item)return;
+ document.getElementById('workflowDescription').textContent=item.desc;
+ if(setTask)document.getElementById('task').value=item.task;
+ updateBaseline();
+}
+function initTaxonomy(){
+ const f=document.getElementById('function');
+ f.innerHTML=Object.keys(payerUseCases).map(x=>`<option>${x}</option>`).join('');
+ f.value='Claims';
+ populateWorkflows('Provider Claim Appeals');
+ f.addEventListener('change',()=>populateWorkflows());
+ document.getElementById('workflow').addEventListener('change',()=>updateWorkflowContext(true));
+}
+
 function updateBaseline(){
  const volume=n('volume'), mins=n('mins'), labor=n('labor');
  const hours=volume*mins/60;
@@ -470,6 +1171,7 @@ function updateBaseline(){
 ['volume','mins','labor'].forEach(id=>{
  document.getElementById(id).addEventListener('input',updateBaseline);
 });
+initTaxonomy();
 updateBaseline();
 
 
@@ -496,16 +1198,21 @@ function updateValueOpportunity(){
 });
 updateValueOpportunity();
 
-['structure','data','exceptions','complexity'].forEach(id=>document.getElementById(id).addEventListener('change',updateWorkOutput));
-['timeReduction','futureTechCost','futureFixed'].forEach(id=>document.getElementById(id).addEventListener('input',calculate));
-document.querySelectorAll('.cap').forEach(x=>x.addEventListener('change',updateWorkOutput));
-['workflowReady','dataAccess','dataQuality','integration','ownership'].forEach(id=>document.getElementById(id).addEventListener('change',updateReadiness));
-['risk','reversible','requirements','detectability','audit'].forEach(id=>document.getElementById(id).addEventListener('change',updateRiskOutput));
+
+
+['structure','data','exceptions','complexity'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{updateWorkOutput();updateGeneratedAssumptions();calculate();}));
+['timeReduction','futureTechCost','futureFixed','sharedPlatform'].forEach(id=>{
+ const el=document.getElementById(id);
+ if(el) el.addEventListener('input',calculate);
+});
+document.querySelectorAll('.cap').forEach(x=>x.addEventListener('change',()=>{updateWorkOutput();updateGeneratedAssumptions();calculate();}));
+['workflowReady','dataAccess','dataQuality','integration','ownership'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{updateReadiness();updateGeneratedAssumptions();calculate();}));
+['risk','reversible','requirements','detectability','audit'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{updateRiskOutput();updateGeneratedAssumptions();calculate();}));
 updateWorkOutput();
 updateReadiness();
 updateRiskOutput();
 
 calculate();
-</script>
+renderPortfolio();showPortfolio();</script>
 </body>
 </html>
