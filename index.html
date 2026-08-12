@@ -1,1218 +1,482 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Decision Economics v0.2</title>
-
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Decision Economics Configurator — Streamlined V2</title>
 <style>
 :root{
-  --bg:#f6f6f5;
-  --surface:#ffffff;
-  --surface-soft:#f3f3f2;
-  --ink:#1d1d1f;
-  --muted:#6f6f73;
-  --line:#dededc;
-  --accent:#2563eb;
-  --accent-2:#1d4ed8;
-  --success:#2563eb;
-  --shadow:0 16px 40px rgba(15,23,32,.06);
+  --navy:#08254a; --navy2:#0d3767; --blue:#1267e8; --lt:#f5f8fc;
+  --line:#dbe4ef; --text:#0b1f3a; --muted:#65758b; --green:#168653;
+  --orange:#d97210; --red:#c93b3b; --purple:#7950d8; --teal:#118a8a;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);background:#fff}
+header{background:var(--navy);color:#fff;padding:14px 24px;position:sticky;top:0;z-index:20}
+.head{display:flex;align-items:center;gap:28px;max-width:1440px;margin:auto}
+.brand{font-weight:800;letter-spacing:.02em;white-space:nowrap}
+.brand small{display:block;font-weight:500;opacity:.8;font-size:11px}
+.steps{display:flex;gap:8px;flex:1;justify-content:center;overflow:auto}
+.step{padding:8px 10px;border-bottom:3px solid transparent;opacity:.65;white-space:nowrap;font-size:13px;cursor:pointer}
+.step.active{opacity:1;border-color:#4aa3ff}
+.step b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#fff2;color:#fff;margin-right:5px}
+.step.active b{background:#2e83ff}
+main{max-width:1380px;margin:0 auto;padding:28px}
+.screen{display:none}
+.screen.active{display:block}
+.toprow{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+h1{font-size:30px;margin:0 0 6px}
+.sub{color:var(--muted);margin-bottom:20px}
+.context{border:1px solid var(--line);border-radius:12px;padding:12px 16px;min-width:340px;background:#fbfdff;font-size:13px}
+.contextgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px}
+.card{border:1px solid var(--line);border-radius:14px;padding:18px;background:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #cfd9e6;border-radius:9px;font:inherit;color:var(--text);background:#fff}
+textarea{min-height:86px}
+.hint{font-size:12px;color:var(--muted);margin-top:5px}
+.sectiontitle{display:flex;gap:10px;align-items:center;margin:24px 0 12px;font-size:19px;font-weight:800}
+.num{display:grid;place-items:center;width:28px;height:28px;background:var(--blue);color:#fff;border-radius:50%;font-size:13px}
+.workflow{display:grid;grid-template-columns:repeat(6,1fr);align-items:stretch;gap:10px}
+.wfstep{position:relative;padding:14px 10px;text-align:center;background:#fbfdff;border:1px solid var(--line);border-radius:12px;min-height:108px}
+.wfstep:not(:last-child):after{content:"→";position:absolute;right:-15px;top:40%;color:var(--blue);font-weight:700;z-index:2}
+.wfstep b{display:block;margin-bottom:6px}
+.wfstep span{font-size:12px;color:var(--muted)}
+.linkbtn{color:var(--blue);font-weight:700;cursor:pointer;font-size:13px}
+.hidden{display:none!important}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fbfdff}
+.kpi .v{font-size:28px;font-weight:800;color:#0d5fc6;margin:5px 0}
+.kpi .l{font-size:12px;color:var(--muted)}
+.notice{background:#eef6ff;border:1px solid #d6e8ff;color:#1554a3;border-radius:10px;padding:12px 14px;font-size:13px}
+.actions{display:flex;justify-content:space-between;margin-top:24px}
+button{border:0;border-radius:9px;padding:12px 18px;font-weight:800;cursor:pointer}
+.primary{background:var(--navy);color:#fff}
+.secondary{background:#fff;border:1px solid var(--line);color:var(--text)}
+.rangeCard{padding:16px;border:1px solid var(--line);border-radius:12px}
+.rangeCard input[type=range]{padding:0}
+.pill{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef4ff;color:#205ab7;font-size:12px;font-weight:800}
+.activities{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.act{border:1px solid var(--line);padding:12px;border-radius:10px;cursor:pointer;background:#fff}
+.act.sel{border-color:#5a96ef;background:#f2f7ff}
+.act input{width:auto;margin-right:8px}
+.summary{background:#fbfdff}
+.bars .row{display:grid;grid-template-columns:170px 1fr 70px;align-items:center;gap:10px;margin:11px 0;font-size:13px}
+.bar{height:9px;background:#e8eef5;border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;background:#2477dd;border-radius:999px}
+.rating{display:flex;gap:8px;margin-top:12px}
+.rating button{flex:1;padding:9px;background:#fff;border:1px solid var(--line);font-size:12px}
+.rating button.sel{background:#eef5ff;border-color:#5a96ef;color:#0f5fc9}
+.status{padding:18px;border-radius:12px;background:#fff9ef;border:1px solid #f3dfb2}
+.status h2{margin:0;color:#c66a00}
+.arch{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.arch .box{padding:12px 14px;border-radius:10px;border:1px solid var(--line);font-weight:700;background:#fbfdff}
+.arch .arr{color:var(--blue);font-weight:900}
+.scenarios table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px;border-bottom:1px solid var(--line);text-align:center}
+th:first-child,td:first-child{text-align:left}
+th.rec,td.rec{background:#f1f8f3}
+.outgrid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+.heroRec{background:#f4fbf7;border:1px solid #cae9d7}
+.heroRec h2{color:var(--green);font-size:28px;margin:4px 0}
+.small{font-size:12px;color:var(--muted)}
+@media(max-width:1000px){
+ .workflow,.grid5,.grid4,.activities,.kpis,.grid3{grid-template-columns:repeat(2,1fr)}
+ .grid2,.outgrid{grid-template-columns:1fr}
+ .context{min-width:0}.toprow{display:block}.context{margin-bottom:15px}
 }
-.shell{
-  max-width:1220px;
-  margin:auto;
-  padding:28px 22px 72px;
-}
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:24px;
-  margin-bottom:28px;
-}
-.kicker{
-  font-size:10px;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  font-weight:800;
-  color:var(--muted);
-}
-h1{
-  font-size:44px;
-  line-height:1.02;
-  letter-spacing:-.045em;
-  margin:6px 0 10px;
-  font-weight:850;
-}
-.sub{
-  color:var(--muted);
-  max-width:760px;
-  line-height:1.55;
-  font-size:16px;
-}
-.badge{
-  border:1px solid var(--line);
-  background:var(--surface);
-  color:var(--accent);
-  border-radius:999px;
-  padding:8px 12px;
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.04em;
-  box-shadow:0 6px 20px rgba(15,23,32,.03);
-}
-.steps{
-  display:grid;
-  gap:0;
-  margin:22px 0 18px;
-  background:transparent;
-  border-bottom:1px solid var(--line);
-}
-.step{
-  position:relative;
-  padding:12px 8px 14px;
-  background:transparent;
-  color:#7b8790;
-  font-size:11px;
-  font-weight:800;
-  text-align:center;
-  text-transform:uppercase;
-  letter-spacing:.06em;
-}
-.step.active{
-  color:var(--accent);
-}
-.step.active:after{
-  content:"";
-  position:absolute;
-  left:14%;
-  right:14%;
-  bottom:-1px;
-  height:3px;
-  border-radius:999px 999px 0 0;
-  background:var(--accent);
-}
-.panel{
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-radius:24px;
-  padding:34px;
-  box-shadow:var(--shadow);
-}
-.page{display:none}
-.page.active{display:block}
-h2{
-  font-size:27px;
-  letter-spacing:-.025em;
-  margin:0 0 7px;
-  font-weight:820;
-}
-.lead{
-  color:var(--muted);
-  margin:0 0 28px;
-  line-height:1.55;
-  font-size:14px;
-  max-width:840px;
-}
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px 22px;
-}
-.field{margin-bottom:2px}
-label{
-  display:block;
-  font-size:12px;
-  font-weight:800;
-  margin-bottom:7px;
-  color:#2b2b2d;
-}
-small{
-  display:block;
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.45;
-  margin-top:6px;
-}
-input,select{
-  width:100%;
-  padding:13px 14px;
-  border:1px solid #d7dde2;
-  border-radius:12px;
-  font-size:14px;
-  background:#fff;
-  color:var(--ink);
-  outline:none;
-  transition:.16s ease;
-}
-input:focus,select:focus{
-  border-color:#8eb0ff;
-  box-shadow:0 0 0 3px rgba(37,99,235,.08);
-}
-.choicegrid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:11px;
-}
-.choice{
-  border:1px solid var(--line);
-  padding:15px;
-  border-radius:14px;
-  cursor:pointer;
-  background:#fff;
-  transition:.16s ease;
-}
-.choice:hover{
-  border-color:#b9c5cc;
-  background:#fbfcfd;
-}
-.choice input{
-  width:auto;
-  margin-right:7px;
-}
-.choice strong{
-  font-size:13px;
-}
-.choice div{
-  font-size:11px;
-  color:var(--muted);
-  margin:5px 0 0 23px;
-  line-height:1.4;
-}
-.nav{
-  display:flex;
-  justify-content:space-between;
-  margin-top:30px;
-  gap:10px;
-}
-button{
-  border:0;
-  border-radius:10px;
-  padding:12px 18px;
-  font-weight:800;
-  cursor:pointer;
-  font-size:13px;
-}
-.primary{
-  background:var(--accent);
-  color:#fff;
-}
-.primary:hover{background:var(--accent-2)}
-.secondary{
-  background:#eeeeed;
-  color:var(--ink);
-}
-.results{
-  display:grid;
-  grid-template-columns:.92fr 1.28fr;
-  gap:24px;
-}
-.hero{
-  background:#222224;
-  color:#fff;
-  border-radius:20px;
-  padding:26px;
-  box-shadow:0 14px 30px rgba(0,0,0,.12);
-}
-.hero .eyebrow{
-  font-size:10px;
-  letter-spacing:.15em;
-  text-transform:uppercase;
-  opacity:.7;
-  font-weight:800;
-}
-.hero .decision{
-  font-size:40px;
-  font-weight:900;
-  letter-spacing:-.045em;
-  margin:6px 0 9px;
-}
-.hero p{
-  opacity:.84;
-  line-height:1.5;
-  margin-bottom:0;
-  font-size:13px;
-}
-.metrics{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-.metric{
-  background:var(--surface-soft);
-  padding:17px;
-  border-radius:15px;
-  border:1px solid #e6eaed;
-}
-.metric .k{
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  color:var(--muted);
-  font-weight:850;
-}
-.metric .v{
-  font-size:24px;
-  font-weight:850;
-  margin-top:6px;
-  letter-spacing:-.03em;
-}
-.section{
-  margin-top:22px;
-  border-top:1px solid var(--line);
-  padding-top:18px;
-}
-.arch{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-  margin-top:10px;
-}
-.pill{
-  background:#f1f1f0;
-  color:#3b3b3e;
-  padding:8px 10px;
-  border-radius:999px;
-  font-size:11px;
-  font-weight:800;
-  border:1px solid #e1e1df;
-}
-.score{
-  display:grid;
-  grid-template-columns:130px 1fr 48px;
-  gap:10px;
-  align-items:center;
-  margin:10px 0;
-  font-size:11px;
-  color:#43505a;
-}
-.track{
-  height:8px;
-  background:#e9edef;
-  border-radius:999px;
-  overflow:hidden;
-}
-.fill{
-  height:100%;
-  background:var(--accent);
-}
-.callout{
-  margin-top:20px;
-  padding:17px 18px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  font-size:12px;
-  line-height:1.55;
-  background:#fbfcfd;
-}
-.insight{
-  margin-top:24px;
-  background:#fafafa;
-  color:var(--ink);
-  border:1px solid #e1e1df;
-  border-left:4px solid var(--accent);
-  border-radius:16px;
-  padding:20px 21px;
-}
-.insight .ik{
-  font-size:9px;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  font-weight:900;
-  color:#747478;
-}
-.insight .iv{
-  font-size:27px;
-  font-weight:900;
-  letter-spacing:-.035em;
-  margin:5px 0;
-  color:#2563eb;
-}
-.insight .id{
-  font-size:12px;
-  line-height:1.5;
-  color:#6f6f73;
-}
-.insight .mini{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-.insight .mini span{
-  background:#fff;
-  color:#444447;
-  border:1px solid #e1e1df;
-  padding:7px 9px;
-  border-radius:999px;
-  font-size:10px;
-  font-weight:800;
-}
-.disclaimer{
-  font-size:10px;
-  color:#7a858e;
-  margin-top:18px;
-  line-height:1.5;
-}
-@media(max-width:760px){
-  .grid2,.results{grid-template-columns:1fr}
-  .choicegrid{grid-template-columns:1fr}
-  .steps{grid-template-columns:repeat(2,1fr)!important}
-  .top{display:block}
-  .badge{display:inline-block;margin-top:12px}
-  .metrics{grid-template-columns:1fr}
-  h1{font-size:36px}
-  .panel{padding:24px 18px}
-}
-
-.portfolio-page{display:block}.assessment-shell{display:none}
-.portfolio-hero h2{font-size:34px;margin-bottom:10px}.portfolio-hero .lead{max-width:920px;font-size:15px}
-.portfolio-actions{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 26px}
-.portfolio-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0 28px}
-.portfolio-kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
-.portfolio-kpi .pk{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:900}
-.portfolio-kpi .pv{font-size:28px;font-weight:900;letter-spacing:-.035em;margin-top:6px}
-.portfolio-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff}
-.portfolio-table{width:100%;border-collapse:collapse;min-width:900px}
-.portfolio-table th{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);background:#fafafa}
-.portfolio-table td{padding:14px;border-bottom:1px solid #ececea;font-size:12px}.portfolio-table tr:last-child td{border-bottom:0}
-.rank{font-size:18px;font-weight:900;color:var(--accent)}.uc{font-weight:850;font-size:13px}.domain{color:var(--muted);font-size:10px;margin-top:3px}
-.tag{display:inline-block;border-radius:999px;padding:6px 8px;background:#f2f2f1;border:1px solid #e1e1df;font-size:9px;font-weight:850;white-space:nowrap}
-.tag.accent{background:#eff4ff;border-color:#d6e3ff;color:#1d4ed8}
-.tag.negative{background:#f7f7f6;border-color:#c9c9c6;color:#2a2a2c}
-.value-negative{font-weight:900;color:#2a2a2c}.empty-state{text-align:center;padding:44px 20px;color:var(--muted)}
-.empty-state strong{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}.portfolio-note{margin-top:18px;color:var(--muted);font-size:11px;line-height:1.5}
-.savebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px}.linkbtn{background:transparent;color:var(--accent);padding:8px 0}
-@media(max-width:760px){.portfolio-kpis{grid-template-columns:1fr 1fr}}
-
-.portfolio-fab{
-  position:fixed;
-  right:22px;
-  bottom:22px;
-  z-index:50;
-  display:none;
-  background:#ffffff;
-  color:var(--accent);
-  border:1px solid #d8e2ff;
-  box-shadow:0 10px 28px rgba(0,0,0,.10);
-  border-radius:999px;
-  padding:11px 15px;
-  font-size:12px;
-  font-weight:850;
-  cursor:pointer;
-}
-.portfolio-fab:hover{background:#f7f9ff}
-
-.assumption-mode{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 18px}
-.assumption-mode button{background:#f2f2f1;color:var(--ink);border:1px solid var(--line)}
-.assumption-mode button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-.scenario-card{border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff}
-.scenario-card.active{border-color:#b9cdfd;background:#f8fbff}
-.scenario-card .sk{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:900}
-.scenario-card .sv{font-size:20px;font-weight:900;margin:5px 0}
-.scenario-card .sd{font-size:10px;color:var(--muted);line-height:1.4}
-.custom-assumptions{display:none;margin-top:14px}
-.assumption-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:8px}
-@media(max-width:760px){.scenario-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.workflow,.grid5,.grid4,.activities,.kpis,.grid3{grid-template-columns:1fr}.steps{justify-content:flex-start}}
 </style>
-
 </head>
 <body>
-<div class="shell">
-<div id="portfolioPage" class="portfolio-page">
- <div class="top"><div><div class="kicker">DECISION ECONOMICS · PAYER</div><h1>AI Investment Portfolio</h1><div class="sub">Turn individual workflow assessments into an enterprise view of where AI, automation, and human judgment can create the most value.</div></div><div class="badge">PAYER PROTOTYPE · v1.2</div></div>
- <div class="panel">
-  <div class="portfolio-hero"><div class="kicker">PORTFOLIO VIEW</div><h2>Where should we invest first?</h2>
-   <p class="lead">Assess payer workflows one at a time, save each recommendation, and build a prioritized portfolio. Decision Economics compares current cost, future-state economics, capacity opportunity, work design, organizational readiness, and risk—then surfaces the opportunities most ready for action. Negative economic cases are retained intentionally so the portfolio can show where AI-enabled redesign does not yet justify the cost.</p>
-   <p class="lead"><strong>How to use it:</strong> Start with a workflow, complete the assessment, and save it here. Repeat for additional use cases. Reset the portfolio when you want to begin a new client, workshop, or scenario.</p>
-  </div>
-  <div class="portfolio-actions"><button class="primary" onclick="startNewAssessment()">+ Assess New Use Case</button><button id="resetPortfolioBtn" class="secondary" onclick="resetPortfolio()">Reset Portfolio</button></div>
-  <div class="portfolio-kpis">
-   <div class="portfolio-kpi"><div class="pk">Use Cases Assessed</div><div class="pv" id="pkUseCases">0</div></div>
-   <div class="portfolio-kpi"><div class="pk">Potential Annual Value</div><div class="pv" id="pkValue">$0</div></div>
-   <div class="portfolio-kpi"><div class="pk">Capacity Opportunity</div><div class="pv" id="pkCapacity">0 FTE</div></div>
-   <div class="portfolio-kpi"><div class="pk">Est. Future-State Cost</div><div class="pv" id="pkFuture">$0</div></div>
-  </div>
-  <div class="portfolio-table-wrap"><table class="portfolio-table"><thead><tr><th>Priority</th><th>Use Case</th><th>Annual Value</th><th>Capacity</th><th>Work Design</th><th>Readiness</th><th>Risk-Adjusted</th><th>Action</th><th></th></tr></thead><tbody id="portfolioRows"></tbody></table><div id="portfolioEmpty" class="empty-state"><strong>No use cases assessed yet.</strong>Start with one payer workflow and build the portfolio from there.</div></div>
-  <div class="portfolio-note">Saved assessments are stored locally in this browser. Reset Portfolio clears the saved use cases on this device so you can begin a fresh client or workshop.</div>
- </div>
+<header>
+<div class="head">
+  <div class="brand">DECISION ECONOMICS<small>CONFIGURATOR · STREAMLINED V2</small></div>
+  <div class="steps" id="navSteps"></div>
 </div>
-<div id="assessmentShell" class="assessment-shell">
- <div class="top">
-  <div><div class="kicker">AI WORK DESIGN</div><h1>Decision Economics</h1><div class="sub">Evaluate where AI, automation, and human judgment create the most economic value.</div></div>
-  <div class="badge">PAYER PROTOTYPE · v1</div>
- </div>
- <div class="steps" style="grid-template-columns:repeat(6,1fr)">
-  <div class="step active">1 · Decision</div><div class="step">2 · Value Opportunity</div><div class="step">3 · Work</div><div class="step">4 · Readiness</div><div class="step">5 · Risk</div><div class="step">6 · Recommendation</div>
- </div>
-
- <div class="panel">
-  <div class="page active">
-   <h2>What decision are we redesigning?</h2>
-   <p class="lead">Start with the work—not the model. Define one repeatable decision or task inside the workflow.</p>
-   <div class="grid2">
-    <div class="field">
-      <label>Business function / domain</label>
-      <select id="function"></select>
-      <small>Select the payer domain first; available workflows will update automatically.</small>
-    </div>
-    <div class="field">
-      <label>Workflow / use case</label>
-      <select id="workflow"></select>
-      <small id="workflowDescription">Select a workflow to see what work is being evaluated.</small>
-    </div>
-    <div class="field">
-      <label>Decision or task being evaluated</label>
-      <input id="task" value="Determine whether a denied claim should be upheld, adjusted, or overturned">
-      <small>Identify the specific unit of work that could be performed by a human, AI, automation—or a combination.</small>
-    </div>
-    <div class="field"><label>Monthly decision volume</label><input id="volume" type="number" value="500000"><small>How many times is this specific decision or task performed each month?</small></div>
-    <div class="field"><label>Human minutes per decision</label><input id="mins" type="number" step=".1" value="4"><small>Average hands-on human time required to complete this decision today.</small></div>
-    <div class="field">
-      <label>Primary role performing the work</label>
-      <select id="role">
-        <option>Claims Specialist</option>
-        <option>Customer Service Representative</option>
-        <option>Nurse Reviewer</option>
-        <option>Analyst</option>
-        <option>Medical Director</option>
-        <option>Other</option>
-      </select>
-      <small>Who performs most of this decision or task today?</small>
-    </div>
-    <div class="field">
-      <label>Loaded human labor cost ($ / hour)</label>
-      <input id="labor" type="number" value="48">
-      <small>Estimated hourly cost including salary, benefits, and applicable overhead.</small>
-    </div>
-   </div>
-
-   <div class="insight">
-     <div class="ik">DECISION BASELINE</div>
-     <div class="iv" id="baselineHeadline">$0 annual cost of work</div>
-     <div class="id">This is the current economic baseline before AI or automation. It becomes the benchmark against which future-state economics are tested.</div>
-     <div class="mini">
-       <span id="liveUnitCost">$0.00 / decision</span>
-       <span id="liveMonthlyCost">$0 / month</span>
-       <span id="liveAnnualCost">$0 / year</span>
-       <span id="liveHumanHours">0 human hrs / month</span>
-     </div>
-   </div>
-
-   <div class="nav"><span></span><button class="primary" onclick="next()">Assess value opportunity →</button></div>
+</header>
+<main>
+<section id="s1" class="screen active">
+  <div class="toprow"><div><h1>What decision are we redesigning?</h1><div class="sub">Start with the workflow, establish today's economics, then test a future-state design.</div></div></div>
+  <div class="grid2 card">
+    <div><label>Domain</label><select id="domain"></select></div>
+    <div><label>Workflow</label><select id="workflow"></select></div>
   </div>
-
-  <div class="page">
-   <h2>Where could AI-enabled work create value?</h2>
-   <p class="lead">Estimate the measurable improvements that could result from redesigning this work with AI, automation, or human augmentation.</p>
-   <div class="grid2">
-    <div class="field">
-      <label>Current error / rework rate (%)</label>
-      <input id="error" type="number" step=".1" value="5">
-      <small>How often does this work require correction, rework, or additional handling?</small>
+  <div class="sectiontitle"><span class="num">1</span>Understand the workflow</div>
+  <div class="card">
+    <div class="workflow" id="workflowStrip"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+      <div class="small">Illustrative reference only. Actual workflow and decision rights may differ.</div>
+      <div class="linkbtn" onclick="toggleAdjust()">Workflow looks different? Adjust assumptions →</div>
     </div>
-    <div class="field">
-      <label>Cost per error / rework event ($)</label>
-      <input id="errorCost" type="number" value="180">
-      <small>Estimated financial impact of each correction, repeat review, or additional handling event.</small>
-    </div>
-    <div class="field">
-      <label>Expected reduction in current errors / rework (%)</label>
-      <input id="errorReduction" type="number" value="35">
-      <small>What portion of today's errors or rework could realistically be avoided?</small>
-      <div id="errorPreview" style="margin-top:8px;font-size:12px;font-weight:750;color:var(--dark)">5.0% current → 3.25% expected after redesign</div>
-    </div>
-    <div class="field">
-      <label>Strategic alignment</label>
-      <select id="strategy"><option value="1">Low</option><option value="2" selected>Moderate</option><option value="3">High</option></select>
-      <small>How directly does this work support a current enterprise priority?</small>
-    </div>
-   </div>
-   <div class="insight">
-      <div class="ik">VALUE OPPORTUNITY</div>
-      <div class="iv" id="valueHeadline">Potential value is being calculated</div>
-      <div class="id">This is potential—not realized—value. The prototype will test whether the assumed improvement is achievable.</div>
-      <div class="metrics" style="margin-top:14px;color:var(--ink)">
-        <div class="metric"><div class="k">Errors / rework today</div><div class="v" id="errorsToday">0</div><div style="font-size:11px;color:var(--muted);margin-top:4px">events / month</div></div>
-        <div class="metric"><div class="k">Expected after redesign</div><div class="v" id="errorsFuture">0</div><div style="font-size:11px;color:var(--muted);margin-top:4px">events / month</div></div>
-        <div class="metric"><div class="k">Potential quality value</div><div class="v" id="potentialQuality">$0</div><div style="font-size:11px;color:var(--muted);margin-top:4px">estimated / year</div></div>
-        <div class="metric"><div class="k">Errors / rework avoided</div><div class="v" id="errorsAvoided">0</div><div style="font-size:11px;color:var(--muted);margin-top:4px">events / month</div></div>
-      </div>
-    </div>
-   <div class="nav"><button class="secondary" onclick="back()">← Back</button><button class="primary" onclick="next()">Characterize work →</button></div>
   </div>
-
-  <div class="page">
-   <h2>How is the work performed today?</h2>
-   <p class="lead">Describe the work itself. Decision Economics uses these characteristics to identify where rules, automation, AI, and human judgment are most appropriate.</p>
-
-   <div class="kicker" style="margin-bottom:12px">WORK CHARACTERISTICS</div>
-   <div class="grid2">
-    <div class="field">
-      <label>How is the decision determined?</label>
-      <select id="structure">
-        <option value="3">Mostly defined rules or criteria</option>
-        <option value="2" selected>Mix of rules and human judgment</option>
-        <option value="1">Primarily human judgment</option>
-      </select>
-      <small>Are outcomes driven by explicit rules, interpretation, or both?</small>
+  <div id="adjustPanel" class="card hidden" style="margin-top:12px;background:#fbfdff">
+    <div class="grid2">
+      <div><label>Model a specific segment (optional)</label><input id="segment" placeholder="e.g., Commercial Medical PA, Radiology"/></div>
+      <div><label>Key material differences (optional)</label><textarea id="diffNotes" placeholder="e.g., 40% straight-through today; mandatory nurse review; delegated vendor..."></textarea></div>
     </div>
-    <div class="field">
-      <label>What information is used?</label>
-      <select id="data">
-        <option value="3">Mostly structured data</option>
-        <option value="2" selected>Structured + unstructured information</option>
-        <option value="1">Mostly documents, text, or other unstructured information</option>
-      </select>
-      <small>Think data fields and codes versus policies, notes, letters, and documents.</small>
-    </div>
-    <div class="field">
-      <label>How standardized is the work?</label>
-      <select id="exceptions">
-        <option value="3">Highly standardized</option>
-        <option value="2" selected>Common path with meaningful exceptions</option>
-        <option value="1">Highly variable</option>
-      </select>
-      <small>How often do cases require different handling or an exception path?</small>
-    </div>
-    <div class="field">
-      <label>How much context is needed?</label>
-      <select id="complexity">
-        <option value="3">Limited — a few fields or a single source</option>
-        <option value="2" selected>Moderate — multiple sources considered together</option>
-        <option value="1">Extensive — significant context or competing information</option>
-      </select>
-      <small>How much information must be brought together to complete the work?</small>
-    </div>
-   </div>
-
-   <div class="kicker" style="margin:10px 0 12px">WORK ACTIVITIES</div>
-   <label>What does a person actually do to complete this work?</label>
-   <div class="choicegrid">
-    <label class="choice"><input class="cap" type="checkbox" value="rules" checked><strong>Check rules or criteria</strong><div>Apply defined policies, thresholds, requirements, or eligibility logic.</div></label>
-    <label class="choice"><input class="cap" type="checkbox" value="retrieve" checked><strong>Find information</strong><div>Locate relevant records, policies, documents, or prior decisions.</div></label>
-    <label class="choice"><input class="cap" type="checkbox" value="classify"><strong>Sort or categorize</strong><div>Identify the type of request, document, case, or exception.</div></label>
-    <label class="choice"><input class="cap" type="checkbox" value="interpret" checked><strong>Interpret information</strong><div>Understand text, documentation, evidence, or other unstructured information.</div></label>
-    <label class="choice"><input class="cap" type="checkbox" value="compare" checked><strong>Compare information</strong><div>Evaluate evidence against policy, criteria, requirements, or other information.</div></label>
-    <label class="choice"><input class="cap" type="checkbox" value="judgment" checked><strong>Make a judgment</strong><div>Select an outcome when the answer is not completely deterministic.</div></label>
-    <label class="choice"><input class="cap" type="checkbox" value="generate" checked><strong>Generate content</strong><div>Draft a response, explanation, summary, or communication.</div></label>
-   </div>
-   <div class="insight">
-     <div class="ik">THEORETICAL WORK DESIGN</div>
-     <div class="iv" id="workHeadline">AUGMENT</div>
-     <div class="id" id="workExplanation">Based on the characteristics and activities above, Decision Economics will estimate the appropriate human + technology relationship before readiness and risk constraints are applied.</div>
-     <div class="mini" id="workTech"></div>
-   </div>
-   <div class="callout">
-     <strong>Future-state economic hypothesis</strong>
-     <div class="assumption-note">Decision Economics generates a planning hypothesis from the work characteristics, readiness, and risk profile. Client evidence can override it; the rapid prototype validates it.</div>
-
-     <div class="assumption-mode">
-       <button type="button" id="modeEstimate" class="active" onclick="setAssumptionMode('estimate')">Use Decision Economics Estimate</button>
-       <button type="button" id="modeRange" onclick="setAssumptionMode('range')">Model a Range</button>
-       <button type="button" id="modeCustom" onclick="setAssumptionMode('custom')">Use My Assumptions</button>
-     </div>
-
-     <div id="scenarioGrid" class="scenario-grid">
-       <div class="scenario-card" id="scenarioConservative">
-         <div class="sk">Conservative</div>
-         <div class="sv" id="consTime">—</div>
-         <div class="sd" id="consCost">—</div>
-       </div>
-       <div class="scenario-card active" id="scenarioExpected">
-         <div class="sk">Expected</div>
-         <div class="sv" id="expTime">—</div>
-         <div class="sd" id="expCost">—</div>
-       </div>
-       <div class="scenario-card" id="scenarioUpside">
-         <div class="sk">Upside</div>
-         <div class="sv" id="upTime">—</div>
-         <div class="sd" id="upCost">—</div>
-       </div>
-     </div>
-
-     <div id="rangeSummary" class="assumption-note"></div>
-
-     <div id="customAssumptions" class="custom-assumptions">
-       <div class="grid2">
-         <div class="field">
-           <label>Estimated human time reduction (%)</label>
-           <input id="timeReduction" type="number" min="0" max="100" value="50">
-           <small>Expected reduction in hands-on human minutes per decision.</small>
-         </div>
-         <div class="field">
-           <label>Estimated technology cost / decision ($)</label>
-           <input id="futureTechCost" type="number" min="0" step=".01" value=".40">
-           <small>Illustrative inference, retrieval, orchestration, and workflow run cost.</small>
-         </div>
-         <div class="field">
-           <label>Use-case-specific fixed cost ($ / month)</label>
-           <input id="futureFixed" type="number" min="0" step="1000" value="12000">
-           <small>Dedicated workflow support, monitoring, maintenance, and use-case-specific operational cost.</small>
-         </div>
-         <div class="field">
-           <label>Shared enterprise platform allocation ($ / month)</label>
-           <input id="sharedPlatform" type="number" min="0" step="1000" value="5000">
-           <small>Allocated share of enterprise AI platform / infrastructure cost. Set to $0 if already treated as sunk/shared enterprise cost.</small>
-         </div>
-       </div>
-     </div>
-   </div>
-
-   <div class="callout" id="futureCostAnatomy">
-     <strong>Estimated future-state cost anatomy</strong>
-     <div class="metrics" style="margin-top:12px">
-       <div class="metric"><div class="k">Remaining human labor</div><div class="v" id="fcLabor">$0</div></div>
-       <div class="metric"><div class="k">Variable technology</div><div class="v" id="fcVariable">$0</div></div>
-       <div class="metric"><div class="k">Use-case fixed cost</div><div class="v" id="fcFixed">$0</div></div>
-       <div class="metric"><div class="k">Shared platform allocation</div><div class="v" id="fcShared">$0</div></div>
-     </div>
-     <div id="economicSignal" style="margin-top:12px;font-size:12px;font-weight:800"></div>
-     <div id="economicDriver" style="margin-top:5px;font-size:11px;color:var(--muted);line-height:1.45"></div>
-   </div>
-
-   <div class="nav"><button class="secondary" onclick="back()">← Back</button><button class="primary" onclick="updateWorkOutput();next()">Assess readiness →</button></div>
   </div>
-
-  <div class="page">
-   <h2>Is the organization ready to enable this work?</h2>
-   <p class="lead">Readiness does not change whether AI is theoretically suitable. It determines what the organization can realistically do next.</p>
-   <div class="grid2">
-    <div class="field"><label>How consistently is the workflow performed today?</label><select id="workflowReady"><option value="3">Standardized</option><option value="2" selected>Partially standardized</option><option value="1">Inconsistent / poorly defined</option></select><small>Is there a stable process to enable?</small></div>
-    <div class="field"><label>How accessible is the required information?</label><select id="dataAccess"><option value="3">Readily accessible</option><option value="2" selected>Accessible with integration effort</option><option value="1">Fragmented / manually accessible</option></select><small>Can the solution reliably get the information it needs?</small></div>
-    <div class="field"><label>How reliable is the required information?</label><select id="dataQuality"><option value="3">Reliable</option><option value="2" selected>Mixed / validation required</option><option value="1">Poor or unknown</option></select><small>Is the information complete and trustworthy enough to support the work?</small></div>
-    <div class="field"><label>How easily can the solution integrate into the workflow?</label><select id="integration"><option value="3">Integration-ready</option><option value="2" selected>Integration possible with effort</option><option value="1">Significant integration constraints</option></select><small>Can outputs be used inside the systems where work actually happens?</small></div>
-    <div class="field"><label>How clearly is the work owned and measured?</label><select id="ownership"><option value="3">Clear ownership + measurable outcomes</option><option value="2" selected>Ownership exists; measurement is limited</option><option value="1">Ownership or success measures are unclear</option></select><small>Can the organization establish accountability and prove value?</small></div>
-   </div>
-   <div class="insight">
-     <div class="ik">CURRENT READINESS</div>
-     <div class="iv" id="readyHeadline">PROTOTYPE WITH CONDITIONS</div>
-     <div class="id" id="readyExplanation"></div>
-     <div class="mini" id="readyConstraints"></div>
-   </div>
-   <div class="nav"><button class="secondary" onclick="back()">← Back</button><button class="primary" onclick="updateReadiness();next()">Assess risk →</button></div>
+  <div class="sectiontitle"><span class="num">2</span>Establish the current-state baseline</div>
+  <div class="grid4 card">
+    <div><label>Monthly workflow volume</label><input id="volume" type="number" value="1000" min="0"/><div class="hint">cases / month</div></div>
+    <div><label>Average human effort</label><input id="minutes" type="number" value="25" min="0"/><div class="hint">minutes / case</div></div>
+    <div><label>Primary workforce</label><select id="role"><option>Nurse + clinician review</option><option>Operations specialist</option><option>Claims analyst</option><option>Mixed / blended</option></select></div>
+    <div><label>Loaded labor cost</label><input id="labor" type="number" value="54" min="0"/><div class="hint">$ / hour</div></div>
   </div>
+  <div class="sectiontitle">Current-State Baseline</div>
+  <div class="kpis" id="baselineKpis"></div>
+  <div class="actions"><span></span><button class="primary" onclick="go(2)">Continue to Value →</button></div>
+</section>
 
-  <div class="page">
-   <h2>What level of autonomy is appropriate?</h2>
-   <p class="lead">Risk does not determine whether AI is useful. It determines how much authority technology should be allowed to have and what controls are required.</p>
-   <div class="grid2">
-    <div class="field"><label>What is the consequence of an incorrect decision?</label><select id="risk"><option value="1">Low</option><option value="2">Moderate</option><option value="3" selected>High</option><option value="4">Severe / critical</option></select></div>
-    <div class="field"><label>How easily can an incorrect decision be reversed?</label><select id="reversible"><option value="1">Easily reversible</option><option value="2" selected>Reversible with effort</option><option value="3">Difficult to reverse</option><option value="4">Effectively irreversible</option></select></div>
-    <div class="field"><label>Are there requirements governing how this decision must be made or reviewed?</label><select id="requirements"><option value="1">No material requirements</option><option value="2">Requirements exist; automation permitted with controls</option><option value="3" selected>Human review required in certain circumstances</option><option value="4">Human decision authority required</option><option value="5">Unknown — requires validation</option></select></div>
-    <div class="field"><label>How readily can an incorrect decision be detected?</label><select id="detectability"><option value="1">Immediately / reliably</option><option value="2" selected>Usually detectable</option><option value="3">Difficult to detect</option><option value="4">Unknown</option></select></div>
-    <div class="field"><label>How much explanation and traceability is required?</label><select id="audit"><option value="1">Basic traceability</option><option value="2">Decision rationale required</option><option value="3" selected>Formal auditability required</option><option value="4">Human rationale / accountability required</option></select></div>
-   </div>
-   <div class="insight">
-     <div class="ik">RISK-ADJUSTED AUTONOMY</div>
-     <div class="iv" id="riskHeadline">AUGMENT</div>
-     <div class="id" id="riskExplanation"></div>
-     <div class="mini" id="riskControls"></div>
-   </div>
-   <div class="nav"><button class="secondary" onclick="back()">← Back</button><button class="primary" onclick="updateRiskOutput();calculate();next()">Generate recommendation →</button></div>
-  </div>
-
-  <div class="page">
-   <div class="results">
-    <div>
-     <div class="hero">
-      <div class="eyebrow">Recommended work design</div>
-      <div class="decision" id="decision">AUGMENT</div>
-      <p id="summary"></p>
-     </div>
-     <div class="section">
-      <strong>Suggested architecture</strong>
-      <div class="arch" id="architecture"></div>
-     </div>
-     <div class="section">
-      <strong>Decision profile</strong>
-      <div class="score"><span>Economic value</span><div class="track"><div id="econBar" class="fill"></div></div><b id="econText"></b></div>
-      <div class="score"><span>Automation fit</span><div class="track"><div id="fitBar" class="fill"></div></div><b id="fitText"></b></div>
-      <div class="score"><span>Decision risk</span><div class="track"><div id="riskBar" class="fill"></div></div><b id="riskText"></b></div>
-     </div>
+<section id="s2" class="screen">
+  <div class="toprow"><div><h1>Define the value opportunity</h1><div class="sub">Size the opportunity before deciding what technology should do.</div></div><div class="context" id="ctx2"></div></div>
+  <div class="grid3">
+    <div class="card"><span class="pill">Operating baseline</span><h2 id="opCost">$0</h2><div class="small">annual labor cost currently consumed</div><h3 id="opHours">0 hrs</h3></div>
+    <div class="card">
+      <span class="pill">Quality opportunity</span>
+      <div style="margin-top:14px"><label>Current error / rework rate</label><input id="errorRate" type="number" value="8" min="0" max="100"/></div>
+      <div style="margin-top:10px"><label>Cost per error / rework event</label><input id="errorCost" type="number" value="550" min="0"/></div>
+      <div style="margin-top:10px"><label>Expected improvement</label><input id="errorImprove" type="number" value="40" min="0" max="100"/></div>
+      <div class="notice" style="margin-top:12px"><b id="qualityValue">$0</b> potential annual quality value</div>
     </div>
-    <div>
-     <h2 id="resultTitle">Claims · Provider claim appeal review</h2>
-     <p class="lead" id="resultTask"></p>
-     <div class="metrics">
-      <div class="metric"><div class="k">Current cost / decision</div><div class="v" id="currentUnit"></div></div>
-      <div class="metric"><div class="k">Estimated future cost / decision</div><div class="v" id="futureUnit"></div></div>
-      <div class="metric"><div class="k">Estimated annual operating value</div><div class="v" id="annualValue"></div></div>
-      <div class="metric"><div class="k">Estimated capacity released</div><div class="v" id="fte"></div></div>
-      <div class="metric"><div class="k">Est. quality / accuracy value / year</div><div class="v" id="qualityValue"></div></div>
-      <div class="metric"><div class="k">Human / AI work mix</div><div class="v" id="mix"></div></div>
-     </div>
-     <div class="callout" id="action"></div>
-     <div class="disclaimer">Illustrative decision-support prototype. Outputs depend on client-supplied assumptions and are intended to frame discovery, prototyping, and validation—not replace detailed financial, clinical, actuarial, legal, or compliance analysis.</div>
+    <div class="card">
+      <span class="pill">Strategic importance</span>
+      <div style="margin-top:14px"><label>Alignment</label><select id="strategy"><option>Moderate</option><option selected>High</option><option>Enterprise Priority</option><option>Low</option></select></div>
+      <div style="margin-top:10px"><label>Why this matters (optional)</label><textarea id="whyMatters" placeholder="Short strategic rationale..."></textarea></div>
     </div>
-   </div>
-   <div class="savebar"><button class="primary" onclick="saveToPortfolio()">Save to Portfolio</button><button class="secondary" onclick="showPortfolio()">Back to Portfolio</button></div>
-<div class="nav"><button class="secondary" onclick="back()">← Change assumptions</button><button class="primary" onclick="restart()">Assess another decision</button></div>
   </div>
- </div>
+  <div class="card" style="margin-top:16px"><b>Addressable opportunity, not guaranteed savings.</b><div class="small">Operating cost, quality opportunity, and current human capacity are carried forward separately so the model does not double-count value.</div></div>
+  <div class="actions"><button class="secondary" onclick="go(1)">← Back</button><button class="primary" onclick="go(3)">Continue to Work →</button></div>
+</section>
 
+<section id="s3" class="screen">
+  <div class="toprow"><div><h1>Characterize the work</h1><div class="sub">Describe the nature of the work so we can infer the right human + technology pattern.</div></div><div class="context" id="ctx3"></div></div>
+  <div class="grid4" id="workDims"></div>
+  <div class="sectiontitle"><span class="num">2</span>What activities does this workflow require?</div>
+  <div class="outgrid">
+    <div class="activities" id="activityGrid"></div>
+    <div class="card summary">
+      <span class="pill">Work profile</span><h2 id="workProfile">Mixed Intelligence Workflow</h2>
+      <div class="bars" id="profileBars"></div>
+      <div class="notice"><b>What this tells us:</b> Different parts of the workflow may require different technology. The model will combine rules, retrieval, language, reasoning, and human judgment rather than forcing one model everywhere.</div>
+    </div>
+  </div>
+  <div class="actions"><button class="secondary" onclick="go(2)">← Back</button><button class="primary" onclick="go(4)">Continue to Readiness →</button></div>
+</section>
 
-</div>
-</div>
-<button id="portfolioFab" class="portfolio-fab" onclick="showPortfolio()">← Portfolio</button>
+<section id="s4" class="screen">
+  <div class="toprow"><div><h1>Assess readiness</h1><div class="sub">Can this workflow realistically support the future-state design?</div></div><div class="context" id="ctx4"></div></div>
+  <div class="grid5" id="readinessCards"></div>
+  <div class="status" style="margin-top:18px"><h2 id="readyLabel">Moderately Ready</h2><div id="readyText">A few capability gaps should be addressed before scaling.</div></div>
+  <div class="actions"><button class="secondary" onclick="go(3)">← Back</button><button class="primary" onclick="go(5)">Continue to Risk →</button></div>
+</section>
+
+<section id="s5" class="screen">
+  <div class="toprow"><div><h1>Assess risk & appropriate autonomy</h1><div class="sub">Determine how much authority technology should have and what human controls are required.</div></div><div class="context" id="ctx5"></div></div>
+  <div class="grid5" id="riskCards"></div>
+  <div class="grid2" style="margin-top:18px">
+    <div class="status"><div class="small">Recommended control model</div><h2 id="controlModel">AI + Mandatory Human Review</h2><div id="controlText">AI can perform much of the work, but a human remains accountable for final determination.</div></div>
+    <div class="card"><b>Autonomy continuum</b><div class="small" style="margin:8px 0 14px">Human-led → AI assist → AI + review → exception review → autonomous</div><div class="bar" style="height:12px"><i id="autonomyBar" style="width:50%"></i></div></div>
+  </div>
+  <div class="actions"><button class="secondary" onclick="go(4)">← Back</button><button class="primary" onclick="go(6)">Generate Recommendation →</button></div>
+</section>
+
+<section id="s6" class="screen">
+  <div class="toprow"><div><h1>Recommendation</h1><div class="sub">Recommended human + technology configuration and editable assumptions for economic modeling.</div></div><div class="context" id="ctx6"></div></div>
+  <div class="card heroRec">
+    <div class="small">RECOMMENDED APPROACH</div>
+    <h2 id="recTitle">AI-Augmented Decisioning + Mandatory Human Review</h2>
+    <div id="recDesc">Use deterministic logic for stable rules, retrieval for source material, language models for interpretation, and reasoning support for assessment. Keep human accountability aligned to risk.</div>
+  </div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card"><b>Technology pattern</b><div class="arch" style="margin-top:14px"><div class="box">Rules</div><span class="arr">→</span><div class="box">Retrieve</div><span class="arr">→</span><div class="box">Interpret</div><span class="arr">→</span><div class="box">Reason</div><span class="arr">→</span><div class="box">Human Review</div></div></div>
+    <div class="card"><b>Why this recommendation?</b><div id="rationale" style="margin-top:12px"></div></div>
+  </div>
+  <div class="card scenarios" style="margin-top:16px">
+    <b>Model the economics</b><div class="small">Starting assumptions are editable. The tool recommends; you control the model.</div>
+    <table>
+      <thead><tr><th>Assumption</th><th>Conservative</th><th class="rec">Expected</th><th>Aggressive</th></tr></thead>
+      <tbody>
+        <tr><td>Human time reduction</td><td><input class="sc" data-k="time" data-s="c" value="25" type="number"/>%</td><td class="rec"><input class="sc" data-k="time" data-s="e" value="45" type="number"/>%</td><td><input class="sc" data-k="time" data-s="a" value="65" type="number"/>%</td></tr>
+        <tr><td>AI / technology cost per 1,000 cases</td><td>$<input class="sc" data-k="var" data-s="c" value="15" type="number"/></td><td class="rec">$<input class="sc" data-k="var" data-s="e" value="10" type="number"/></td><td>$<input class="sc" data-k="var" data-s="a" value="6" type="number"/></td></tr>
+        <tr><td>Implementation / fixed cost (one-time)</td><td>$<input class="sc" data-k="fixed" data-s="c" value="150000" type="number"/></td><td class="rec">$<input class="sc" data-k="fixed" data-s="e" value="100000" type="number"/></td><td>$<input class="sc" data-k="fixed" data-s="a" value="75000" type="number"/></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="actions"><button class="secondary" onclick="go(5)">← Back</button><button class="primary" onclick="go(7)">Calculate Future-State Economics →</button></div>
+</section>
+
+<section id="s7" class="screen">
+  <div class="toprow"><div><h1>Economic output</h1><div class="sub">Compare the current state with the modeled future-state range.</div></div><div class="context" id="ctx7"></div></div>
+  <div class="grid3" id="scenarioOutputs"></div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card"><b>Expected scenario</b><div class="kpis" style="grid-template-columns:repeat(2,1fr);margin-top:12px" id="expectedKpis"></div></div>
+    <div class="card"><b>Interpretation</b><div id="outputNarrative" style="margin-top:10px"></div><div class="notice" style="margin-top:14px">Illustrative decision-support prototype. Outputs depend on user-supplied assumptions and should frame discovery, prototyping, and validation—not replace detailed financial, clinical, actuarial, legal, or compliance analysis.</div></div>
+  </div>
+  <div class="actions"><button class="secondary" onclick="go(6)">← Change assumptions</button><button class="primary" onclick="resetApp()">Assess another workflow</button></div>
+</section>
+</main>
+
 <script>
-let editingPortfolioId=null;
-
-const PORTFOLIO_KEY='decisionEconomicsPayerPortfolioV12';
-function getPortfolio(){try{return JSON.parse(localStorage.getItem(PORTFOLIO_KEY)||'[]')}catch(e){return[]}}
-function setPortfolio(x){localStorage.setItem(PORTFOLIO_KEY,JSON.stringify(x))}
-function numText(x){return Number(String(x||'').replace(/[^0-9.-]/g,''))||0}
-function showPortfolio(){document.getElementById('portfolioPage').style.display='block';document.getElementById('assessmentShell').style.display='none';document.getElementById('portfolioFab').style.display='none';renderPortfolio();window.scrollTo(0,0)}
-function showAssessment(){document.getElementById('portfolioPage').style.display='none';document.getElementById('assessmentShell').style.display='block';document.getElementById('portfolioFab').style.display='block';window.scrollTo(0,0)}
-function startNewAssessment(){restart();showAssessment()}
-function resetPortfolio(){
-  try{
-    // Clear every Decision Economics portfolio key from this browser,
-    // including keys created by earlier prototype versions.
-    const keys=[];
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      if(k && k.toLowerCase().includes('decisioneconomics')) keys.push(k);
-    }
-    keys.forEach(k=>localStorage.removeItem(k));
-    sessionStorage.clear();
-
-    // Force the visible portfolio back to an empty state immediately.
-    const rows=document.getElementById('portfolioRows');
-    if(rows) rows.innerHTML='';
-    const empty=document.getElementById('portfolioEmpty');
-    if(empty) empty.style.display='block';
-
-    document.getElementById('pkUseCases').textContent='0';
-    document.getElementById('pkValue').textContent='$0';
-    document.getElementById('pkCapacity').textContent='0 FTE';
-    document.getElementById('pkFuture').textContent='$0';
-
-    editingPortfolioId=null;
-    renderPortfolio();
-
-    const btn=document.getElementById('resetPortfolioBtn');
-    if(btn){
-      const old=btn.textContent;
-      btn.textContent='Portfolio Reset ✓';
-      setTimeout(()=>btn.textContent=old,1400);
-    }
-  }catch(e){
-    console.error('Reset failed',e);
-    alert('Reset failed in this browser. Please refresh and try again.');
+const names=["Decision","Value","Work","Readiness","Risk","Recommendation","Output"];
+const workflowLibrary = {
+  "Utilization Management": {
+    "Prior Authorization": [
+      ["Receive","Intake and classify request"],
+      ["Gather","Retrieve clinical and policy information"],
+      ["Assess","Check completeness and identify gaps"],
+      ["Evaluate","Interpret criteria and evidence"],
+      ["Determine","Approve, deny, or escalate"],
+      ["Communicate","Generate decision and notify"]
+    ],
+    "Concurrent Review": [
+      ["Identify","Identify active cases requiring review"],
+      ["Gather","Collect clinical status and utilization data"],
+      ["Assess","Evaluate continued-stay criteria"],
+      ["Coordinate","Clarify gaps with care teams"],
+      ["Determine","Authorize, modify, or escalate"],
+      ["Document","Record determination and next review"]
+    ],
+    "Retrospective Review": [
+      ["Receive","Receive completed case for review"],
+      ["Gather","Assemble clinical and utilization records"],
+      ["Assess","Validate completeness and eligibility"],
+      ["Evaluate","Compare care delivered to criteria"],
+      ["Determine","Confirm, adjust, or escalate"],
+      ["Document","Record rationale and outcome"]
+    ]
+  },
+  "Claims & Payment": {
+    "Claims Appeal Review": [
+      ["Receive","Receive appeal and classify issue"],
+      ["Gather","Assemble claim, policy, and supporting records"],
+      ["Validate","Confirm eligibility and completeness"],
+      ["Evaluate","Interpret policy and claim history"],
+      ["Determine","Uphold, overturn, or escalate"],
+      ["Communicate","Issue rationale and disposition"]
+    ],
+    "Claims Adjudication": [
+      ["Receive","Ingest and validate claim"],
+      ["Check","Apply eligibility and benefit rules"],
+      ["Compare","Evaluate coding and contract terms"],
+      ["Calculate","Determine allowed and payable amounts"],
+      ["Resolve","Route edits and exceptions"],
+      ["Finalize","Pay, deny, or pend claim"]
+    ],
+    "Payment Integrity Review": [
+      ["Identify","Flag claim or payment for review"],
+      ["Gather","Collect claim, contract, and clinical evidence"],
+      ["Analyze","Assess anomaly or edit rationale"],
+      ["Validate","Confirm overpayment or underpayment"],
+      ["Determine","Recover, adjust, or release"],
+      ["Document","Record rationale and audit trail"]
+    ]
+  },
+  "Member Experience": {
+    "Member Grievance": [
+      ["Receive","Receive grievance and classify issue"],
+      ["Gather","Collect member, service, and case information"],
+      ["Investigate","Review facts and supporting records"],
+      ["Assess","Determine policy and service implications"],
+      ["Resolve","Select appropriate resolution"],
+      ["Communicate","Respond to member and document outcome"]
+    ],
+    "Member Inquiry Resolution": [
+      ["Receive","Identify member question or need"],
+      ["Retrieve","Find benefit, claim, or policy information"],
+      ["Interpret","Translate information into member context"],
+      ["Resolve","Answer or route unresolved issues"],
+      ["Confirm","Verify understanding and next steps"],
+      ["Document","Record interaction and outcome"]
+    ]
+  },
+  "Care Management": {
+    "Case Identification & Prioritization": [
+      ["Identify","Detect members who may need support"],
+      ["Gather","Collect clinical, utilization, and risk data"],
+      ["Assess","Evaluate needs and acuity"],
+      ["Prioritize","Rank cases by impact and urgency"],
+      ["Assign","Route to appropriate care team"],
+      ["Monitor","Track engagement and outcomes"]
+    ],
+    "Care Plan Review": [
+      ["Gather","Assemble current care-plan information"],
+      ["Assess","Evaluate goals, barriers, and progress"],
+      ["Coordinate","Reconcile inputs across care team"],
+      ["Adjust","Recommend plan updates"],
+      ["Approve","Confirm revised care plan"],
+      ["Monitor","Track follow-up and outcomes"]
+    ]
   }
-}
-function actionLabel(r){return r==='READY TO PROTOTYPE'?'Prototype Now':r==='PROTOTYPE WITH CONDITIONS'?'Controlled Prototype':'Enable First'}
-function tier(a){return a==='Prototype Now'?1:a==='Controlled Prototype'?2:3}
-function saveToPortfolio(){
- try{
- calculate();
- const volume=n('volume'), futureUnit=numText(document.getElementById('futureUnit').textContent);
- const readiness=document.getElementById('readyHeadline').textContent;
- const operatingValue=numText(document.getElementById('annualValue').textContent);
- const qualityValue=numText(document.getElementById('qualityValue').textContent);
- const item={id:'uc_'+Date.now(),domain:val('function'),workflow:val('workflow'),
- annualValue:operatingValue+qualityValue,operatingValue:operatingValue,qualityValue:qualityValue,
- capacity:numText(document.getElementById('fte').textContent),futureAnnual:futureUnit*volume*12,
- work:getWorkDesign(),readiness:readiness,risk:riskAutonomy(),action:actionLabel(readiness)};
- const items=getPortfolio();items.push(item);setPortfolio(items);showPortfolio();
- }catch(e){console.error(e);alert('Could not save this assessment yet. You can still return to the portfolio using the Portfolio button.');}
-}
-function deletePortfolioItem(id){setPortfolio(getPortfolio().filter(x=>x.id!==id));renderPortfolio()}
-function renderPortfolio(){
- const items=getPortfolio().sort((a,b)=>tier(a.action)-tier(b.action)||b.annualValue-a.annualValue);
- document.getElementById('pkUseCases').textContent=items.length;
- document.getElementById('pkValue').textContent=money(items.reduce((s,x)=>s+x.annualValue,0));
- document.getElementById('pkCapacity').textContent=items.reduce((s,x)=>s+x.capacity,0).toFixed(1)+' FTE';
- document.getElementById('pkFuture').textContent=money(items.reduce((s,x)=>s+x.futureAnnual,0));
- document.getElementById('portfolioRows').innerHTML=items.map((x,i)=>`<tr><td class="rank">${i+1}</td><td><div class="uc">${x.workflow}</div><div class="domain">${x.domain}</div></td><td>
-  <div class="${x.annualValue<0?'value-negative':''}">${money(x.annualValue)}</div>
-  ${(typeof x.operatingValue==='number' && typeof x.qualityValue==='number')
-      ? `<div class="domain">Operating ${money(x.operatingValue)} · Quality / Accuracy ${money(x.qualityValue)}</div>`
-      : ''}
-  ${x.annualValue<0?'<span class="tag negative" style="margin-top:5px">Negative Economic Case</span>':''}
-</td><td>${x.capacity.toFixed(1)} FTE</td><td><span class="tag">${x.work}</span></td><td><span class="tag">${x.readiness==='READY TO PROTOTYPE'?'READY':x.readiness==='PROTOTYPE WITH CONDITIONS'?'CONDITIONAL':'CONSTRAINED'}</span></td><td><span class="tag">${x.risk}</span></td><td><span class="tag accent">${x.action}</span></td><td><button class="linkbtn" onclick="deletePortfolioItem('${x.id}')">Delete</button></td></tr>`).join('');
- document.getElementById('portfolioEmpty').style.display=items.length?'none':'block';
-}
-
-let page=0;
-const pages=[...document.querySelectorAll('.page')], steps=[...document.querySelectorAll('.step')];
-function show(){pages.forEach((p,i)=>p.classList.toggle('active',i===page));steps.forEach((s,i)=>s.classList.toggle('active',i===page));window.scrollTo({top:0,behavior:'smooth'})}
-function next(){if(page<5){page++;show()}}
-function back(){if(page>0){page--;show()}}
-function restart(){page=0;show()}
-const n=id=>+document.getElementById(id).value||0;
-const val=id=>document.getElementById(id).value;
-const money=x=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(x);
-const money2=x=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(x);
-const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-function getWorkDesign(){
- const structure=n('structure'), predict=n('exceptions');
- let score=0;
- score += structure===3 ? 2 : structure===2 ? 1 : -1;
- score += predict===3 ? 2 : predict===2 ? 1 : -1;
- const caps=[...document.querySelectorAll('.cap:checked')].map(x=>x.value);
- if(caps.includes('judgment')) score-=1;
- if(score>=3) return 'AUTOMATE';
- if(score>=1) return 'AUGMENT';
- if(score>=-1) return 'ASSIST';
- return 'HUMAN';
-}
-function architecture(){
- const caps=[...document.querySelectorAll('.cap:checked')].map(x=>x.value);
- const data=n('data'), complexity=n('complexity');
- let arch=[];
- if(caps.includes('rules')) arch.push(data===3?'Rules / Workflow':'Rules + AI Interpretation');
- if(caps.includes('retrieve')) arch.push(data===3?'API / Data Lookup':'Retrieval / RAG');
- if(caps.includes('classify')) arch.push(data===3?'Rules / Classifier':'Specialized Classifier');
- if(caps.includes('interpret')) arch.push(complexity===3?'Small Language Model':complexity===2?'Language Model':'Higher-Capability Model');
- if(caps.includes('compare')) arch.push(data===3?'Deterministic Comparison':'Grounded Comparison');
- if(caps.includes('judgment')) arch.push('Human Judgment / Reasoning Support');
- if(caps.includes('generate')) arch.push('Grounded Generation');
- return [...new Set(arch)];
-}
-function updateWorkOutput(){
- const d=getWorkDesign(), arch=architecture();
- document.getElementById('workHeadline').textContent=d;
- let text=d==='AUTOMATE'?'The work is largely rule-driven and predictable, creating strong theoretical automation potential before risk and readiness are considered.':
- d==='AUGMENT'?'The work has a predictable core but also requires interpretation or judgment. Technology can perform meaningful portions while humans retain higher-value decision work.':
- d==='ASSIST'?'The work depends materially on human judgment or variability. AI is better suited to retrieving, interpreting, comparing, or drafting than owning the decision.':
- 'The work is highly dependent on human discretion. Target narrow assistive capabilities rather than transferring decision authority.';
- document.getElementById('workExplanation').textContent=text;
- document.getElementById('workTech').innerHTML=arch.slice(0,5).map(x=>'<span>'+x+'</span>').join('');
-}
-function updateReadiness(){
- const vals=[
-  ['Workflow',n('workflowReady')],['Data access',n('dataAccess')],['Data quality',n('dataQuality')],
-  ['Integration',n('integration')],['Ownership',n('ownership')]
- ];
- const lows=vals.filter(x=>x[1]===1), mids=vals.filter(x=>x[1]===2);
- let headline, explanation;
- if(lows.length){
-   headline='REDESIGN / ENABLE FIRST';
-   explanation='The AI opportunity may still be attractive, but current readiness would constrain implementation. Address the binding constraint before broad deployment; a controlled prototype may still be appropriate to validate the value case.';
- } else if(mids.length){
-   headline='PROTOTYPE WITH CONDITIONS';
-   explanation='The organization is sufficiently ready to test the concept, but the prototype should explicitly validate or remediate the identified readiness constraints before scale.';
- } else {
-   headline='READY TO PROTOTYPE';
-   explanation='No material readiness barrier is evident from the current assessment. Move to a controlled prototype and validate actual performance and economics.';
- }
- document.getElementById('readyHeadline').textContent=headline;
- document.getElementById('readyExplanation').textContent=explanation;
- const constraints=[...lows,...mids].map(x=>x[0]+': '+(x[1]===1?'constraint':'validate'));
- document.getElementById('readyConstraints').innerHTML=(constraints.length?constraints:['No material constraint identified']).map(x=>'<span>'+x+'</span>').join('');
- return headline;
-}
-function riskAutonomy(){
- const work=getWorkDesign();
- const levels=['HUMAN','ASSIST','AUGMENT','AUTOMATE'];
- let ceiling=3;
- const consequence=n('risk'), rev=n('reversible'), req=n('requirements'), detect=n('detectability'), audit=n('audit');
- if(consequence===4 || rev===4) ceiling=Math.min(ceiling,1);
- else if(consequence===3 && rev>=3) ceiling=Math.min(ceiling,2);
- if(req===4) ceiling=Math.min(ceiling,1);
- if(req===3) ceiling=Math.min(ceiling,2);
- if(req===5) ceiling=Math.min(ceiling,2);
- if(detect>=3) ceiling=Math.min(ceiling,2);
- if(audit===4) ceiling=Math.min(ceiling,1);
- const wi=levels.indexOf(work);
- return levels[Math.min(wi,ceiling)];
-}
-function updateRiskOutput(){
- const result=riskAutonomy(), controls=[];
- if(n('risk')>=2) controls.push('Monitoring');
- if(n('risk')>=3) controls.push('Exception controls');
- if(n('requirements')>=2) controls.push('Policy / compliance controls');
- if(n('requirements')===3 || n('requirements')===4) controls.push('Human review');
- if(n('detectability')>=3) controls.push('Validation');
- if(n('audit')>=2) controls.push('Decision rationale');
- if(n('audit')>=3) controls.push('Audit trail');
- document.getElementById('riskHeadline').textContent=result;
- document.getElementById('riskExplanation').textContent=
-   'Work suggests '+getWorkDesign()+'. Based on consequence, reversibility, decision requirements, detectability, and auditability, the current risk-adjusted autonomy is '+result+'.';
- document.getElementById('riskControls').innerHTML=[...new Set(controls)].map(x=>'<span>'+x+'</span>').join('');
- return result;
-}
-
-let assumptionMode='estimate';
-
-function readinessFactor(){
- const vals=[n('workflowReady'),n('dataAccess'),n('dataQuality'),n('integration'),n('ownership')];
- const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
- return avg>=2.8?1:avg>=2?0.9:0.75;
-}
-function riskFactor(){
- const result=riskAutonomy();
- return result==='AUTOMATE'?1:result==='AUGMENT'?.88:result==='ASSIST'?.65:.45;
-}
-function architectureComplexity(){
- const a=architecture();
- let score=1;
- if(a.some(x=>x.includes('Retrieval'))) score+=1;
- if(a.some(x=>x.includes('Language')||x.includes('Model'))) score+=1;
- if(a.some(x=>x.includes('Reasoning'))) score+=1;
- if(a.some(x=>x.includes('Human Judgment'))) score+=1;
- return Math.min(score,5);
-}
-function generatedAssumptions(){
- const design=getWorkDesign();
- const baseTime={HUMAN:15,ASSIST:30,AUGMENT:50,AUTOMATE:70}[design]||30;
- const expectedTime=Math.round(Math.max(10,Math.min(80,baseTime*readinessFactor()*riskFactor())));
- const complexity=architectureComplexity();
- const expectedTech=Number((0.08 + complexity*0.10).toFixed(2));
- const expectedFixed=Math.round((6000 + complexity*2500 + (readinessFactor()<1?4000:0))/1000)*1000;
- const expectedShared=5000;
- const conservative={
-   time:Math.max(5,Math.round(expectedTime*0.7)),
-   tech:Number((expectedTech*1.5).toFixed(2)),
-   fixed:Math.round(expectedFixed*1.2/1000)*1000,
-   shared:expectedShared
- };
- const expected={time:expectedTime,tech:expectedTech,fixed:expectedFixed,shared:expectedShared};
- const upside={
-   time:Math.min(90,Math.round(expectedTime*1.25)),
-   tech:Number(Math.max(.03,expectedTech*0.75).toFixed(2)),
-   fixed:Math.round(expectedFixed*0.9/1000)*1000,
-   shared:expectedShared
- };
- return {conservative,expected,upside};
-}
-function scenarioEconomics(s){
- const volume=n('volume'), mins=n('mins'), labor=n('labor');
- const currentHours=volume*mins/60, current=currentHours*labor;
- const futureHumanMinutes=mins*(1-s.time/100);
- const futureHumanHours=volume*futureHumanMinutes/60;
- const futureLabor=futureHumanHours*labor;
- const futureTech=volume*s.tech;
- const futureMonthly=futureLabor+futureTech+s.fixed+s.shared;
- return {
-   futureMonthly,
-   futureUnit:volume?futureMonthly/volume:0,
-   operatingValue:(current-futureMonthly)*12,
-   fte:Math.max(0,(currentHours-futureHumanHours)/173.33)
- };
-}
-function updateGeneratedAssumptions(){
- const g=generatedAssumptions();
- document.getElementById('consTime').textContent=g.conservative.time+'% time reduction';
- document.getElementById('expTime').textContent=g.expected.time+'% time reduction';
- document.getElementById('upTime').textContent=g.upside.time+'% time reduction';
- document.getElementById('consCost').textContent=money2(g.conservative.tech)+' tech / decision · '+money(g.conservative.fixed+g.conservative.shared)+'/mo fixed + shared';
- document.getElementById('expCost').textContent=money2(g.expected.tech)+' tech / decision · '+money(g.expected.fixed+g.expected.shared)+'/mo fixed + shared';
- document.getElementById('upCost').textContent=money2(g.upside.tech)+' tech / decision · '+money(g.upside.fixed+g.upside.shared)+'/mo fixed + shared';
-
- const c=scenarioEconomics(g.conservative), e=scenarioEconomics(g.expected), u=scenarioEconomics(g.upside);
- document.getElementById('rangeSummary').textContent=
-   assumptionMode==='range'
-   ? 'Illustrative annual operating value range: '+money(c.operatingValue)+' to '+money(u.operatingValue)+'. Expected case: '+money(e.operatingValue)+'.'
-   : 'Expected-case assumptions are generated from the current assessment and should be validated in a rapid prototype.';
- return g;
-}
-function setAssumptionMode(mode){
- assumptionMode=mode;
- ['Estimate','Range','Custom'].forEach(x=>{
-   const el=document.getElementById('mode'+x);
-   if(el) el.classList.toggle('active', mode===x.toLowerCase());
- });
- document.getElementById('customAssumptions').style.display=mode==='custom'?'block':'none';
- document.getElementById('scenarioGrid').style.display=mode==='custom'?'none':'grid';
- updateGeneratedAssumptions();
- calculate();
-}
-function activeAssumptions(){
- if(assumptionMode==='custom'){
-   return {time:n('timeReduction'),tech:n('futureTechCost'),fixed:n('futureFixed'),shared:n('sharedPlatform')};
- }
- return generatedAssumptions().expected;
-}
-function calculate(){
- const volume=n('volume'), mins=n('mins'), labor=n('labor');
- const currentHours=volume*mins/60, current=currentHours*labor;
- const quality=volume*12*(n('error')/100)*(n('errorReduction')/100)*n('errorCost');
- const decision=riskAutonomy(), ready=updateReadiness(), arch=architecture();
- document.getElementById('architecture').innerHTML=arch.map(x=>`<span class="pill">${x}</span>`).join('');
- document.getElementById('decision').textContent=decision;
- document.getElementById('summary').textContent='This is the risk-adjusted target work design. Future-state cost, operating value, and capacity are planning estimates generated from the assessment unless client evidence overrides them; all should be validated through a rapid prototype.';
- document.getElementById('resultTitle').textContent=val('function')+' · '+val('workflow');
- document.getElementById('resultTask').textContent=val('task')+' · Primary role today: '+val('role');
- document.getElementById('currentUnit').textContent=money2(volume?current/volume:0);
- const assumptions=activeAssumptions();
- const timeReduction=clamp(assumptions.time/100,0,1);
- const futureHumanMinutes=mins*(1-timeReduction);
- const futureHumanHours=volume*futureHumanMinutes/60;
- const futureLabor=futureHumanHours*labor;
- const futureTech=volume*assumptions.tech;
- const futureFixed=assumptions.fixed;
- const sharedPlatform=assumptions.shared;
- const futureMonthly=futureLabor+futureTech+futureFixed+sharedPlatform;
- const futureUnit=volume?futureMonthly/volume:0;
- const operatingValue=(current-futureMonthly)*12;
- const releasedHours=Math.max(0,currentHours-futureHumanHours);
- const releasedFTE=releasedHours/173.33;
-
- // Explain the cost anatomy instead of hiding it inside one number.
- const parts=[
-   ['Remaining human labor',futureLabor],
-   ['Variable technology',futureTech],
-   ['Use-case fixed cost',futureFixed],
-   ['Shared platform allocation',sharedPlatform]
- ];
- const largest=parts.slice().sort((a,b)=>b[1]-a[1])[0];
- const fcLabor=document.getElementById('fcLabor');
- if(fcLabor){
-   fcLabor.textContent=money(futureLabor)+'/mo';
-   document.getElementById('fcVariable').textContent=money(futureTech)+'/mo';
-   document.getElementById('fcFixed').textContent=money(futureFixed)+'/mo';
-   document.getElementById('fcShared').textContent=money(sharedPlatform)+'/mo';
-   const signal=document.getElementById('economicSignal');
-   const driver=document.getElementById('economicDriver');
-   if(operatingValue<0){
-     signal.textContent='NEGATIVE OPERATING CASE';
-     signal.style.color='#2a2a2c';
-     driver.textContent='Estimated future operating cost exceeds the current cost of work by '+money(Math.abs(operatingValue))+' per year. Largest future-state cost driver: '+largest[0]+'.';
-   } else {
-     signal.textContent='POSITIVE OPERATING CASE';
-     signal.style.color='var(--accent)';
-     driver.textContent='Estimated future operating cost is below the current cost of work by '+money(operatingValue)+' per year. Largest future-state cost driver: '+largest[0]+'.';
-   }
- }
- document.getElementById('futureUnit').textContent=money2(futureUnit);
- document.getElementById('annualValue').textContent=money(operatingValue);
- document.getElementById('fte').textContent=releasedFTE.toFixed(1)+' FTE';
- document.getElementById('qualityValue').textContent=money(quality);
- document.getElementById('mix').textContent=decision;
- const fitMap={HUMAN:20,ASSIST:45,AUGMENT:70,AUTOMATE:90};
- const fit=fitMap[getWorkDesign()];
- const riskRaw=Math.round(((n('risk')+n('reversible')+Math.min(n('requirements'),4)+n('detectability')+n('audit'))/20)*100);
- const econ=current>0?Math.min(100,Math.round((quality/current/12)*100)):0;
- document.getElementById('econBar').style.width=econ+'%';document.getElementById('econText').textContent=econ+'%';
- document.getElementById('fitBar').style.width=fit+'%';document.getElementById('fitText').textContent=fit+'%';
- document.getElementById('riskBar').style.width=riskRaw+'%';document.getElementById('riskText').textContent=riskRaw+'%';
- let action;
- if(ready==='READY TO PROTOTYPE') action='<strong>Recommended next step: RAPID PROTOTYPE.</strong> Validate actual human-time reduction, quality, exception rate, technology cost per decision, ongoing operating cost, and controls before making a scale decision.';
- else if(ready==='PROTOTYPE WITH CONDITIONS') action='<strong>Recommended next step: CONTROLLED PROTOTYPE.</strong> Test the work design while explicitly validating the readiness constraints identified in the assessment.';
- else action='<strong>Recommended next step: ENABLE / REDESIGN FIRST.</strong> Address the primary workflow, data, integration, or ownership constraint. Use a limited prototype only if needed to prove that the value opportunity justifies remediation.';
- document.getElementById('action').innerHTML=action;
-}
-
-const payerUseCases={
- 'Utilization Management':[
-  {name:'Prior Authorization Review',desc:'Evaluate whether a requested service meets coverage and medical-necessity criteria using benefit, policy, authorization, and clinical information.',task:'Determine whether a requested service meets applicable coverage and medical-necessity criteria'}
- ],
- 'Claims':[
-  {name:'Claims Adjudication & Exception Handling',desc:'Resolve claims that cannot follow standard adjudication because of edits, missing information, conflicts, or other exceptions.',task:'Determine the appropriate disposition for a claim that falls outside standard adjudication'},
-  {name:'Provider Claim Appeals',desc:'Review a provider challenge to a claim denial or payment decision using the original claim, denial rationale, policy, and supporting evidence.',task:'Determine whether a denied claim should be upheld, adjusted, or overturned'}
- ],
- 'Payment Integrity':[
-  {name:'Prepay Payment Integrity Review',desc:'Evaluate a flagged claim before payment to determine whether billing, coding, policy, or documentation concerns warrant adjustment or further review.',task:'Determine whether a flagged claim should be paid, adjusted, denied, or escalated before payment'},
-  {name:'Overpayment Review & Recovery',desc:'Validate suspected overpayments after payment and determine whether recovery is appropriate based on claim, contract, policy, and supporting evidence.',task:'Determine whether a suspected overpayment is valid and should move to recovery'}
- ],
- 'Member Operations':[
-  {name:'Member Grievances & Appeals',desc:'Review member complaints or appeals, assemble relevant evidence, apply benefit and policy requirements, and determine the appropriate resolution.',task:'Determine the appropriate resolution to a member grievance or appeal'},
-  {name:'Complex Member Inquiry Resolution',desc:'Research and resolve member questions requiring information from multiple systems, policies, benefits, claims, or prior interactions.',task:'Determine the correct response and resolution for a complex member inquiry'}
- ],
- 'Provider Operations':[
-  {name:'Complex Provider Inquiry Resolution',desc:'Research and resolve provider questions involving claims, reimbursement, policy, authorization, contracting, or other multi-source information.',task:'Determine the correct response and resolution for a complex provider inquiry'}
- ],
- 'Enrollment':[
-  {name:'Enrollment & Eligibility Exception Handling',desc:'Resolve enrollment or eligibility cases that fail standard rules because of conflicting, missing, late, or unusual member information.',task:'Determine the appropriate resolution for an enrollment or eligibility exception'}
- ],
- 'Network Operations':[
-  {name:'Provider Credentialing',desc:'Verify provider qualifications and documentation against credentialing requirements and identify exceptions requiring additional review.',task:'Determine whether a provider satisfies credentialing requirements or requires exception review'}
- ],
- 'Other / Custom':[
-  {name:'Other / Custom Workflow',desc:'Use this for a payer workflow not included in the starter taxonomy. Define the specific decision or task below.',task:'Describe the specific decision or task being evaluated'}
- ]
 };
-function populateWorkflows(preferred){
- const items=payerUseCases[val('function')]||[];
- const w=document.getElementById('workflow');
- w.innerHTML=items.map(x=>`<option>${x.name}</option>`).join('');
- if(preferred&&items.some(x=>x.name===preferred))w.value=preferred;
- updateWorkflowContext(true);
+let state={
+ work:{logic:2,info:3,variation:2,context:3},
+ activities:{Retrieve:1,Classify:1,"Rules / Calculate":1,Interpret:1,Compare:1,"Reason / Judge":1,Generate:1},
+ readiness:{Data:2,Integration:1,Process:2,Governance:2,Workforce:3},
+ risk:{Impact:3,Compliance:2,Reversibility:1,Explainability:2,Exceptions:3}
+};
+function money(n){return "$"+Math.round(n).toLocaleString()}
+function num(n,d=0){return Number(n).toLocaleString(undefined,{maximumFractionDigits:d})}
+function vals(){
+ return {
+  volume:+document.getElementById("volume").value||0, minutes:+document.getElementById("minutes").value||0,
+  labor:+document.getElementById("labor").value||0, error:+document.getElementById("errorRate").value||0,
+  errCost:+document.getElementById("errorCost").value||0, improve:+document.getElementById("errorImprove").value||0
+ }
 }
-function updateWorkflowContext(setTask){
- const item=(payerUseCases[val('function')]||[]).find(x=>x.name===val('workflow'));
- if(!item)return;
- document.getElementById('workflowDescription').textContent=item.desc;
- if(setTask)document.getElementById('task').value=item.task;
- updateBaseline();
+function calcBase(){
+ const v=vals(), annualVol=v.volume*12, hrs=annualVol*v.minutes/60, cost=hrs*v.labor, cpu=v.minutes/60*v.labor;
+ return {annualVol,hrs,cost,cpu}
 }
-function initTaxonomy(){
- const f=document.getElementById('function');
- f.innerHTML=Object.keys(payerUseCases).map(x=>`<option>${x}</option>`).join('');
- f.value='Claims';
- populateWorkflows('Provider Claim Appeals');
- f.addEventListener('change',()=>populateWorkflows());
- document.getElementById('workflow').addEventListener('change',()=>updateWorkflowContext(true));
+function calcQuality(){
+ const v=vals(), b=calcBase();
+ return b.annualVol*(v.error/100)*v.errCost*(v.improve/100)
 }
-
-function updateBaseline(){
- const volume=n('volume'), mins=n('mins'), labor=n('labor');
- const hours=volume*mins/60;
- const monthly=hours*labor;
- const unit=volume?monthly/volume:0;
- const annual=monthly*12;
- document.getElementById('liveUnitCost').textContent=money2(unit)+' / decision';
- document.getElementById('liveMonthlyCost').textContent=money(monthly)+' / month';
- document.getElementById('liveAnnualCost').textContent=money(annual)+' / year';
- document.getElementById('liveHumanHours').textContent=hours.toLocaleString('en-US',{maximumFractionDigits:0})+' human hrs / month';
- document.getElementById('baselineHeadline').textContent=money(annual)+' annual cost of work';
+function renderNav(active=1){
+ navSteps.innerHTML=names.map((n,i)=>`<div class="step ${i+1===active?'active':''}" onclick="go(${i+1})"><b>${i+1}</b>${n}</div>`).join("")
 }
-['volume','mins','labor'].forEach(id=>{
- document.getElementById(id).addEventListener('input',updateBaseline);
+function currentWorkflowSteps(){
+  const d = domain.value;
+  const w = workflow.value;
+  return (workflowLibrary[d] && workflowLibrary[d][w]) ? workflowLibrary[d][w] : [];
+}
+function renderWorkflow(){
+ const steps=currentWorkflowSteps();
+ workflowStrip.innerHTML=steps.map(x=>`<div class="wfstep"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
+}
+function populateDomains(){
+  domain.innerHTML=Object.keys(workflowLibrary).map(d=>`<option value="${d}">${d}</option>`).join("");
+  populateWorkflows();
+}
+function populateWorkflows(){
+  const workflows=Object.keys(workflowLibrary[domain.value]||{});
+  const previous=workflow.value;
+  workflow.innerHTML=workflows.map(w=>`<option value="${w}">${w}</option>`).join("");
+  if(workflows.includes(previous)) workflow.value=previous;
+  renderWorkflow();
+  refresh();
+}
+function toggleAdjust(){adjustPanel.classList.toggle("hidden")}
+function renderBase(){
+ const b=calcBase()
+ document.getElementById("baselineKpis").innerHTML=[
+  ["Annual Volume",num(b.annualVol),"cases"],["Human Hours",num(b.hrs),"hours / year"],["Annual Labor Cost",money(b.cost),"fully loaded"],["Cost / Case",money(b.cpu),"current state"]
+ ].map(x=>`<div class="kpi"><b>${x[0]}</b><div class="v">${x[1]}</div><div class="l">${x[2]}</div></div>`).join("")
+}
+function contextHTML(){
+ const b=calcBase();
+ return `<div class="contextgrid"><b>Workflow</b><span>${workflow.value}</span><b>Volume</b><span>${num(vals().volume)} / month</span><b>Current effort</b><span>${num(vals().minutes)} min / case</span><b>Baseline cost</b><span>${money(b.cost)} / year</span></div>`
+}
+function renderValue(){
+ const b=calcBase(); document.getElementById("opCost").textContent=money(b.cost);document.getElementById("opHours").textContent=num(b.hrs)+" human hrs / year";qualityValue.textContent=money(calcQuality())
+}
+const dimDefs=[
+ ["Decision logic","Rules-driven","Judgment-driven","logic"],
+ ["Information","Structured","Unstructured","info"],
+ ["Variation","Standardized","Exception-heavy","variation"],
+ ["Context required","Narrow","Broad","context"]
+]
+function renderWork(){
+ workDims.innerHTML=dimDefs.map(d=>{
+  let val=state.work[d[3]]
+  return `<div class="rangeCard"><b>${d[0]}</b><input type="range" min="1" max="3" value="${val}" oninput="state.work.${d[3]}=+this.value;renderProfile()"><div style="display:flex;justify-content:space-between" class="small"><span>${d[1]}</span><span>${d[2]}</span></div></div>`
+ }).join("")
+ activityGrid.innerHTML=Object.keys(state.activities).map(a=>`<label class="act ${state.activities[a]?'sel':''}"><input type="checkbox" ${state.activities[a]?'checked':''} onchange="state.activities['${a}']=this.checked?1:0;renderWork()">${a}<div class="small">${activityDesc(a)}</div></label>`).join("")
+ renderProfile()
+}
+function activityDesc(a){
+ return {Retrieve:"Find records, policies, or data",Classify:"Categorize or route cases","Rules / Calculate":"Apply defined rules or computations",Interpret:"Understand text or evidence",Compare:"Evaluate against criteria","Reason / Judge":"Apply contextual judgment",Generate:"Draft response or documentation"}[a]
+}
+function renderProfile(){
+ const A=state.activities
+ let bars={
+  "Rules / Automation": (A["Rules / Calculate"]?70:25),
+  "Retrieval / Search": (A.Retrieve?80:20),
+  "Language / Interpretation": ((A.Interpret||A.Classify)?65:20),
+  "Reasoning / Judgment": ((A["Reason / Judge"]||state.work.logic===3)?60:25),
+  "Generation": (A.Generate?45:15)
+ }
+ profileBars.innerHTML=Object.entries(bars).map(([k,v])=>`<div class="row"><span>${k}</span><div class="bar"><i style="width:${v}%"></i></div><b>${v>=70?'High':v>=40?'Moderate':'Low'}</b></div>`).join("")
+}
+function ratingCard(group,key,label,desc){
+ let val=state[group][key]
+ return `<div class="card"><b>${label}</b><div class="small" style="min-height:38px;margin-top:5px">${desc}</div><div class="rating">${[1,2,3].map(x=>`<button class="${val===x?'sel':''}" onclick="state.${group}.${key}=${x};${group==='readiness'?'renderReadiness()':'renderRisk()'}">${['Low','Moderate','High'][x-1]}</button>`).join("")}</div></div>`
+}
+function renderReadiness(){
+ const defs=[["Data","Data readiness","Quality, completeness, and timeliness"],["Integration","Integration & access","Connectivity and access to required information"],["Process","Process stability","Consistency and standardization"],["Governance","Governance & security","Controls, privacy, accountability"],["Workforce","Change & workforce","Buy-in, skills, and adoption capacity"]]
+ readinessCards.innerHTML=defs.map(d=>ratingCard("readiness",...d)).join("")
+ let avg=Object.values(state.readiness).reduce((a,b)=>a+b,0)/5
+ readyLabel.textContent=avg>=2.6?"Highly Ready":avg>=1.7?"Moderately Ready":"Early / Constrained"
+ readyText.textContent=avg>=2.6?"The workflow has strong enabling conditions for scaled implementation.":avg>=1.7?"A few capability gaps should be addressed before scaling.":"Prototype narrowly and address enabling constraints before broad deployment."
+}
+function renderRisk(){
+ const defs=[["Impact","Decision impact","Consequence of an incorrect decision"],["Compliance","Regulatory / compliance","Degree of regulatory or audit exposure"],["Reversibility","Reversibility","Ease of correcting an incorrect decision"],["Explainability","Explainability","Need to defend and trace decisions"],["Exceptions","Exceptions","Frequency of ambiguity or non-routine cases"]]
+ riskCards.innerHTML=defs.map(d=>ratingCard("risk",...d)).join("")
+ let r=state.risk, score=(r.Impact+r.Compliance+(4-r.Reversibility)+r.Explainability+r.Exceptions)/5
+ let text, width
+ if(score>=2.55){text="AI + Mandatory Human Review";width=50;controlText.textContent="AI can perform much of the work, but a human should remain accountable for final determination."}
+ else if(score>=1.9){text="AI Assist + Targeted Human Review";width=65;controlText.textContent="AI can drive routine work while humans review higher-risk or uncertain outcomes."}
+ else {text="Exception Review / Higher Autonomy";width=82;controlText.textContent="Lower consequence and stronger reversibility may support greater straight-through processing with exception controls."}
+ controlModel.textContent=text;autonomyBar.style.width=width+"%"
+}
+function renderRec(){
+ renderRisk();renderReadiness()
+ recTitle.textContent=controlModel.textContent
+ let rb=readyLabel.textContent, risks=Object.entries(state.risk).sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>x[0]).join(" + ")
+ rationale.innerHTML=`<div class="pill">Mixed intelligence work</div> <div class="pill">${rb}</div> <div class="pill">Key risk: ${risks}</div>`
+}
+function getScenario(s){
+ let o={};document.querySelectorAll(`.sc[data-s="${s}"]`).forEach(e=>o[e.dataset.k]=+e.value||0);return o
+}
+function calcScenario(s){
+ const b=calcBase(), q=calcQuality(), x=getScenario(s)
+ const remaining=b.cost*(1-x.time/100)
+ const varcost=(b.annualVol/1000)*x.var
+ const annualRun=remaining+varcost
+ const opValue=b.cost-annualRun
+ const hrsReleased=b.hrs*(x.time/100)
+ const year1=opValue+q-x.fixed
+ return {annualRun,opValue,hrsReleased,q,year1,fixed:x.fixed,time:x.time}
+}
+function renderOutput(){
+ const map=[["c","Conservative"],["e","Expected"],["a","Aggressive"]]
+ scenarioOutputs.innerHTML=map.map(([k,n])=>{
+  let x=calcScenario(k)
+  return `<div class="card"><span class="pill">${n}</span><h2>${money(x.year1)}</h2><div class="small">Year-1 net modeled value</div><hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><b>${money(x.annualRun)}</b><div class="small">future-state annual run cost</div><br><b>${num(x.hrsReleased)} hrs</b><div class="small">human capacity released / year</div></div>`
+ }).join("")
+ const x=calcScenario("e")
+ expectedKpis.innerHTML=[
+  ["Operating value",money(x.opValue),"annual run-rate"],["Quality value",money(x.q),"potential / year"],["Capacity released",num(x.hrsReleased),"hours / year"],["Year-1 net",money(x.year1),"after fixed cost"]
+ ].map(z=>`<div class="kpi"><b>${z[0]}</b><div class="v">${z[1]}</div><div class="l">${z[2]}</div></div>`).join("")
+ outputNarrative.innerHTML=`Under the expected scenario, the model assumes <b>${x.time}% lower human effort</b>. That produces an estimated <b>${money(x.opValue)}</b> annual operating-value run rate before implementation cost, plus <b>${money(x.q)}</b> of potential quality value. Year-1 modeled net value is <b>${money(x.year1)}</b>.`
+}
+function refresh(){
+ renderBase();renderValue();renderWork();renderReadiness();renderRisk();renderRec()
+}
+function go(n){
+ document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById("s"+n).classList.add("active");renderNav(n)
+ for(let i=2;i<=7;i++){let c=document.getElementById("ctx"+i);if(c)c.innerHTML=contextHTML()}
+ refresh();if(n===7)renderOutput();window.scrollTo(0,0)
+}
+function resetApp(){location.reload()}
+domain.addEventListener("change",()=>populateWorkflows());
+workflow.addEventListener("change",()=>{renderWorkflow();refresh();});
+["volume","minutes","labor"].forEach(id=>{
+  const el=document.getElementById(id);
+  ["input","change"].forEach(evt=>el.addEventListener(evt,()=>{
+    renderBase();
+    for(let i=2;i<=7;i++){const c=document.getElementById("ctx"+i);if(c)c.innerHTML=contextHTML();}
+    renderValue();
+  }));
 });
-initTaxonomy();
-updateBaseline();
-
-
-function updateValueOpportunity(){
- const volume=n('volume');
- const rate=n('error')/100;
- const reduction=clamp(n('errorReduction')/100,0,1);
- const eventCost=n('errorCost');
- const currentEvents=volume*rate;
- const avoided=currentEvents*reduction;
- const futureEvents=currentEvents-avoided;
- const futureRate=rate*(1-reduction);
- const annualPotential=avoided*eventCost*12;
-
- document.getElementById('errorsToday').textContent=currentEvents.toLocaleString('en-US',{maximumFractionDigits:0});
- document.getElementById('errorsFuture').textContent=futureEvents.toLocaleString('en-US',{maximumFractionDigits:0});
- document.getElementById('errorsAvoided').textContent=avoided.toLocaleString('en-US',{maximumFractionDigits:0});
- document.getElementById('potentialQuality').textContent=money(annualPotential);
- document.getElementById('valueHeadline').textContent=money(annualPotential)+' potential annual quality value';
- document.getElementById('errorPreview').textContent=(rate*100).toFixed(1)+'% current → '+(futureRate*100).toFixed(2)+'% expected after redesign';
-}
-['volume','error','errorReduction','errorCost'].forEach(id=>{
- document.getElementById(id).addEventListener('input',updateValueOpportunity);
+["errorRate","errorCost","errorImprove"].forEach(id=>{
+  const el=document.getElementById(id);
+  ["input","change"].forEach(evt=>el.addEventListener(evt,()=>renderValue()));
 });
-updateValueOpportunity();
-
-
-
-['structure','data','exceptions','complexity'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{updateWorkOutput();updateGeneratedAssumptions();calculate();}));
-['timeReduction','futureTechCost','futureFixed','sharedPlatform'].forEach(id=>{
- const el=document.getElementById(id);
- if(el) el.addEventListener('input',calculate);
-});
-document.querySelectorAll('.cap').forEach(x=>x.addEventListener('change',()=>{updateWorkOutput();updateGeneratedAssumptions();calculate();}));
-['workflowReady','dataAccess','dataQuality','integration','ownership'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{updateReadiness();updateGeneratedAssumptions();calculate();}));
-['risk','reversible','requirements','detectability','audit'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{updateRiskOutput();updateGeneratedAssumptions();calculate();}));
-updateWorkOutput();
-updateReadiness();
-updateRiskOutput();
-
-calculate();
-renderPortfolio();showPortfolio();</script>
+renderNav(1);populateDomains();renderWorkflow();refresh()
+</script>
 </body>
 </html>
